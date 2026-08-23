@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Agency Inventory Management Platform</title>
+  <meta name="description" content="A customizable inventory, procurement, property, and reporting workspace for public-sector agencies.">
+  <meta property="og:title" content="Agency Inventory Management Platform">
+  <meta property="og:description" content="Procurement, inspection, inventory, property, and official reports in one customizable workspace.">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css?v=20260814-structured-report-items">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><span class="brand-seal agency-brand-mark" aria-hidden="true">AI</span><div><strong data-agency-name>YOUR AGENCY</strong><p>Inventory Management System</p></div></div>
+      <nav aria-label="Main navigation">
+        <small>MAIN MODULES</small>
+        <button class="active" data-view="Dashboard"><i>⌂</i><span>Dashboard</span></button>
+        <button data-view="Purchase Orders"><i>PO</i><span>Purchase Orders</span></button>
+        <button data-view="Inspection & Acceptance"><i>IA</i><span>Inspection and Acceptance Reports</span></button>
+        <small>MANAGEMENT</small>
+        <button data-view="Property Records"><i>PR</i><span>Property Records</span></button>
+        <button data-view="Admin Options"><i>AD</i><span>Admin Options</span></button>
+        <button data-view="Forms"><i>FM</i><span>Forms</span></button>
+        <button data-view="Reports"><i>RP</i><span>Reports</span></button>
+      </nav>
+      <div class="sidebar-foot"><div><span>✓</span><p><strong>System operational</strong><small>Last sync · Just now</small></p></div><p>Version 1.0 · Internal monitoring</p></div>
+    </aside>
+    <button class="nav-scrim" id="scrim" aria-label="Close navigation"></button>
+    <div class="content-shell">
+      <header class="topbar"><div class="topbar-title"><button class="mobile-menu" id="menu" aria-label="Open navigation">☰</button><div><p>Inventory and Property Management</p><h1 id="page-title">Dashboard</h1></div></div><div class="topbar-actions"><button class="icon-button" aria-label="Notifications">♢<span></span></button><div class="account-area"><button class="account-trigger" id="account-trigger" type="button" aria-haspopup="menu" aria-expanded="false"><span class="profile-mark">GS</span><span class="profile-copy"><strong>General Services Unit</strong><small>Supply & Property</small></span><span class="account-chevron">⌄</span></button><div class="account-menu" id="account-menu" role="menu" hidden></div></div></div></header>
+      <main id="main"></main>
+    </div>
+  </div>
+  <div id="modal"></div>
+  <script src="/config.js?v=20260805-iar-invoice"></script>
+  <script src="/supabase-client.js?v=20260814-registration-errors"></script>
+  <script src="/app.js?v=20260814-property-unit-id-mapping"></script>
+  <script src="/supabase-integration.js?v=20260814-property-field-mapping"></script>
+</body>
+</html>
