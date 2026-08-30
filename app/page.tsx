@@ -622,8 +622,12 @@ function SinopDmwWorkspace({ theme }: { theme: AgencyTheme }) {
   return <iframe className="sinop-dmw-workspace" title="Sinop inventory and property workspace" src="/workspace/index.html" />;
 }
 
+// Temporary preview switch: keep the sales website and onboarding available in
+// the code while opening the complete Sinop application directly for review.
+const DIRECT_APP_PREVIEW = true;
+
 export default function Home() {
-  const [journey, setJourney] = useState<"landing" | "login" | "registration" | "setup" | "app">("landing");
+  const [journey, setJourney] = useState<"landing" | "login" | "registration" | "setup" | "app">(DIRECT_APP_PREVIEW ? "app" : "landing");
   const [requestedPlan, setRequestedPlan] = useState<SubscriptionPlan>("Yearly");
   const [registration, setRegistration] = useState<RegistrationData | null>(null);
   const [module, setModule] = useState<Module>("Dashboard");
