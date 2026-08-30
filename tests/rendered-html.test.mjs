@@ -34,11 +34,12 @@ test("keeps the duplicate disconnected from the DMW backend by default", async (
 });
 
 test("packages the complete DMW-parity workspace and verified transfer data", async () => {
-  const [html, engine, hydration, workspaceCss] = await Promise.all([
+  const [html, engine, hydration, workspaceCss, qrLibrary] = await Promise.all([
     readFile(new URL("dist/client/workspace/index.html", root), "utf8"),
     readFile(new URL("dist/client/workspace/app.js", root), "utf8"),
     readFile(new URL("dist/client/workspace/transfer-hydration.js", root), "utf8"),
     readFile(new URL("dist/client/workspace/style.css", root), "utf8"),
+    readFile(new URL("dist/client/workspace/qrcode.min.js", root), "utf8"),
   ]);
   let transfer;
   try {
@@ -61,6 +62,10 @@ test("packages the complete DMW-parity workspace and verified transfer data", as
   assert.match(engine, /forms-report-select/);
   assert.match(engine, /const physicalReportOptions=\["Appendix 66 \(RCPI\)","Appendix 73 \(RPCPPE\)","Annex A\.4"\]/);
   assert.match(engine, /Source records available for the three consolidated reports/);
+  assert.match(engine, /data-generate-property-qr/);
+  assert.match(engine, /sinop:\/\/property\//);
+  assert.match(html, /qrcode\.min\.js/);
+  assert.ok(qrLibrary.length > 10000);
   assert.match(hydration, /sinop-dmw-workspace-state-v1/);
   for (const dashboardFeature of ["Connected users now", "PHILIPPINE STANDARD TIME", "Inventory Balance"]) {
     assert.match(engine, new RegExp(dashboardFeature));

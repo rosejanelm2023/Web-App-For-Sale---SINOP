@@ -1024,3 +1024,32 @@ img[data-agency-header][hidden]{display:none!important}
   .forms-report-picker{width:100%}
   .reports-overview-grid{grid-template-columns:1fr}
 }
+
+/* Printable property QR labels for physical-count scanning. */
+.qr-modal-backdrop{align-items:center;justify-content:center;padding:24px}
+.qr-modal{width:min(480px,100%);overflow:hidden;border-radius:18px;background:#fff;box-shadow:0 28px 90px rgba(7,26,40,.34);color:#243640}
+.qr-modal-head{display:flex;align-items:center;justify-content:space-between;padding:20px 22px;border-bottom:1px solid #dfe7eb}
+.qr-modal-head p{margin:0 0 4px;color:var(--tenant-primary);font:800 8pt Aptos,"Segoe UI",Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase}
+.qr-modal-head h2{margin:0;color:#10232f;font:700 18pt Georgia,"Times New Roman",serif}
+.qr-modal-head button{width:34px;height:34px;border:1px solid #d8e2e7;border-radius:50%;background:#fff;color:#52616b;font-size:20px;cursor:pointer}
+.qr-label-preview{box-sizing:border-box;width:330px;max-width:calc(100% - 44px);margin:24px auto 18px;padding:18px;border:1.5px solid #10232f;border-radius:10px;background:#fff;color:#10232f;text-align:center}
+.qr-label-agency{display:grid;gap:2px;padding-bottom:11px;border-bottom:1px solid #d5dde1}
+.qr-label-agency strong{font:700 13pt Georgia,"Times New Roman",serif}
+.qr-label-agency small{color:#52616b;font:400 8pt Aptos,"Segoe UI",Arial,sans-serif}
+.qr-label-preview canvas{display:block;width:240px!important;height:240px!important;max-width:100%;margin:12px auto;background:#fff}
+.qr-label-details{display:grid;gap:4px;padding-top:10px;border-top:1px solid #d5dde1}
+.qr-label-details strong{font:700 12pt Georgia,"Times New Roman",serif}
+.qr-label-details span{font:700 10pt Aptos,"Segoe UI",Arial,sans-serif}
+.qr-label-details small{color:#52616b;font:400 8pt Aptos,"Segoe UI",Arial,sans-serif;overflow-wrap:anywhere}
+.qr-security-note{margin:0;padding:0 24px;color:#52616b;font:400 9pt/1.5 Aptos,"Segoe UI",Arial,sans-serif}
+.qr-security-note strong{color:#243640}
+.qr-modal-actions{display:flex;justify-content:flex-end;gap:9px;padding:20px 22px}
+@media(max-width:520px){.qr-modal-backdrop{padding:12px}.qr-label-preview{max-width:calc(100% - 28px);margin-top:16px}.qr-modal-actions{align-items:stretch;flex-direction:column}.qr-modal-actions button{width:100%}}
+@media print{
+  @page{size:letter portrait;margin:12mm}
+  body:has(.qr-label-preview)>.app-shell{display:none!important}
+  body:has(.qr-label-preview) #modal>.qr-modal-backdrop{position:static;display:block;padding:0;background:#fff}
+  body:has(.qr-label-preview) .qr-modal{width:100%;overflow:visible;border-radius:0;box-shadow:none}
+  body:has(.qr-label-preview) .qr-label-preview{width:82mm;max-width:none;margin:0 auto;padding:6mm;border:1.5px solid #000;border-radius:0}
+  body:has(.qr-label-preview) .qr-label-preview canvas{width:55mm!important;height:55mm!important}
+}
