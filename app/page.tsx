@@ -615,16 +615,20 @@ function SinopAdminUpdated({theme,setTheme,section,setSection,employees,setEmplo
   </>;
 }
 
+// Temporary preview switch: keep the sales website and onboarding available in
+// the code while opening the complete Sinop application directly for review.
+const DIRECT_APP_PREVIEW = true;
+
 function SinopDmwWorkspace({ theme }: { theme: AgencyTheme }) {
   useEffect(() => {
+    // The complete workspace owns its System Settings while direct preview is
+    // active. Do not replace a palette it already saved when the outer shell
+    // remounts during a browser refresh.
+    if (DIRECT_APP_PREVIEW && localStorage.getItem("sinop-tenant-theme")) return;
     localStorage.setItem("sinop-tenant-theme", JSON.stringify(theme));
   }, [theme]);
   return <iframe className="sinop-dmw-workspace" title="Sinop inventory and property workspace" src="/workspace/index.html" />;
 }
-
-// Temporary preview switch: keep the sales website and onboarding available in
-// the code while opening the complete Sinop application directly for review.
-const DIRECT_APP_PREVIEW = true;
 
 export default function Home() {
   const [journey, setJourney] = useState<"landing" | "login" | "registration" | "setup" | "app">(DIRECT_APP_PREVIEW ? "app" : "landing");
