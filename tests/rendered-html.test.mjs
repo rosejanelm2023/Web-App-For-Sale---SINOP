@@ -66,6 +66,7 @@ test("packages the complete DMW-parity workspace and verified transfer data", as
     assert.match(engine, new RegExp(settingFeature));
   }
   assert.match(hydration, /applySinopTenantTheme/);
+  assert.match(hydration, /themeTargets = \[document\.documentElement, document\.body\]/);
   assert.match(hydration, /tenant-primary-text/);
   assert.match(workspaceCss, /Strict tenant-palette enforcement/);
   assert.match(workspaceCss, /\.tenant-themed \.process-line \.done b/);

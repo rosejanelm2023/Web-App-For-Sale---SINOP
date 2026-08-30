@@ -31,18 +31,23 @@
     const primary = colors[0]; const accent = colors[1]; const tertiary = colors[2] || accent;
     document.body.classList.add("tenant-themed");
     window.stockCardEntityName = theme.agencyName || fallback.agencyName;
-    document.documentElement.style.setProperty("--navy", primary);
-    document.documentElement.style.setProperty("--blue", primary);
-    document.documentElement.style.setProperty("--teal", accent);
-    document.documentElement.style.setProperty("--green", accent);
-    document.documentElement.style.setProperty("--tenant-primary", primary);
-    document.documentElement.style.setProperty("--tenant-accent", accent);
-    document.documentElement.style.setProperty("--tenant-tertiary", tertiary);
-    document.documentElement.style.setProperty("--tenant-third", tertiary);
-    document.documentElement.style.setProperty("--tenant-primary-text", contrastText(primary));
-    document.documentElement.style.setProperty("--tenant-accent-text", contrastText(accent));
-    document.documentElement.style.setProperty("--tenant-tertiary-text", contrastText(tertiary));
-    document.documentElement.style.setProperty("--tenant-soft", `color-mix(in srgb, ${accent} 11%, #ffffff)`);
+    const themeTargets = [document.documentElement, document.body];
+    themeTargets.forEach((target) => {
+      target.style.setProperty("--navy", primary);
+      target.style.setProperty("--navy-dark", primary);
+      target.style.setProperty("--blue", primary);
+      target.style.setProperty("--teal", accent);
+      target.style.setProperty("--green", accent);
+      target.style.setProperty("--agency-accent", accent);
+      target.style.setProperty("--tenant-primary", primary);
+      target.style.setProperty("--tenant-accent", accent);
+      target.style.setProperty("--tenant-tertiary", tertiary);
+      target.style.setProperty("--tenant-third", tertiary);
+      target.style.setProperty("--tenant-primary-text", contrastText(primary));
+      target.style.setProperty("--tenant-accent-text", contrastText(accent));
+      target.style.setProperty("--tenant-tertiary-text", contrastText(tertiary));
+      target.style.setProperty("--tenant-soft", `color-mix(in srgb, ${accent} 11%, #ffffff)`);
+    });
     document.querySelectorAll("[data-agency-name]").forEach((node) => { node.textContent = window.stockCardEntityName; });
     document.querySelectorAll(".agency-brand-mark").forEach((node) => {
       node.innerHTML = theme.logoPreview ? `<img src="${theme.logoPreview}" alt="${window.stockCardEntityName} logo">` : "S";
