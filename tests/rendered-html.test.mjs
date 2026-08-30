@@ -34,10 +34,11 @@ test("keeps the duplicate disconnected from the DMW backend by default", async (
 });
 
 test("packages the complete DMW-parity workspace and verified transfer data", async () => {
-  const [html, engine, hydration] = await Promise.all([
+  const [html, engine, hydration, workspaceCss] = await Promise.all([
     readFile(new URL("dist/client/workspace/index.html", root), "utf8"),
     readFile(new URL("dist/client/workspace/app.js", root), "utf8"),
     readFile(new URL("dist/client/workspace/transfer-hydration.js", root), "utf8"),
+    readFile(new URL("dist/client/workspace/style.css", root), "utf8"),
   ]);
   let transfer;
   try {
@@ -66,6 +67,10 @@ test("packages the complete DMW-parity workspace and verified transfer data", as
   }
   assert.match(hydration, /applySinopTenantTheme/);
   assert.match(hydration, /tenant-primary-text/);
+  assert.match(workspaceCss, /Strict tenant-palette enforcement/);
+  assert.match(workspaceCss, /\.tenant-themed \.process-line \.done b/);
+  assert.match(workspaceCss, /\.tenant-themed \.badge-green/);
+  assert.doesNotMatch(engine, /style\.color="#16825f"/);
   assert.equal(actual, expected);
   assert.ok(expected === 568 || expected === 0);
 });

@@ -173,7 +173,7 @@ function bind(){
  document.querySelectorAll("[data-process]").forEach(b=>b.onclick=()=>render(current));
  document.querySelector("#new-ris")?.addEventListener("click",openRISForm);
  document.querySelector("#save-setting")?.addEventListener("click",e=>{e.target.textContent="✓ Setting saved";setTimeout(()=>e.target.textContent="Save setting",1800)});
- document.querySelectorAll(".generate").forEach(b=>b.onclick=()=>{b.textContent="✓ Prepared";b.style.color="#16825f"});
+ document.querySelectorAll(".generate").forEach(b=>b.onclick=()=>{b.textContent="✓ Prepared";b.style.color="var(--tenant-accent)"});
 }
 function openPO(){
   const uomOptions=(selected="")=>`<option value="">Select UOM</option>${masters.UOM.map(row=>`<option value="${row[1]}" ${row[1]===selected?"selected":""}>${row[0]} (${row[1]})</option>`).join("")}`;
@@ -1325,7 +1325,7 @@ function bindEnhanced(){
   document.querySelectorAll("[data-print-rsmi]").forEach(button=>button.onclick=()=>openRsmiView(+button.dataset.printRsmi,true));
   document.querySelectorAll("[data-export]").forEach(b=>b.onclick=()=>exportCurrentCsv(b.dataset.export));
   document.querySelectorAll("[data-print]").forEach(b=>b.onclick=()=>window.print());
-  document.querySelectorAll(".generate").forEach(b=>b.onclick=()=>{b.textContent="✓ Prepared";b.style.color="#16825f"});
+  document.querySelectorAll(".generate").forEach(b=>b.onclick=()=>{b.textContent="✓ Prepared";b.style.color="var(--tenant-accent)"});
 }
 
 function nextRisNumber(dateValue=localISODate()){
