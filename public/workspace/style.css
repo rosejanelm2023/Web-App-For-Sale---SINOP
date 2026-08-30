@@ -955,3 +955,40 @@ img[data-agency-header][hidden]{display:none!important}
 .tenant-themed .data-table tbody td small{
   color:#687781!important;
 }
+
+/* Final readable text treatment for navigation tabs and white action cards. */
+.tenant-themed .page-heading p,
+.tenant-themed .welcome-row p,
+.tenant-themed .panel-heading p,
+.tenant-themed .property-choice-card p,
+.tenant-themed .property-choice-card small,
+.tenant-themed .report-card p,
+.tenant-themed .report-card small{
+  color:#52616b!important;
+}
+.tenant-themed .property-choice-card h3,
+.tenant-themed .property-choice-card strong,
+.tenant-themed .report-card h3,
+.tenant-themed .report-card strong{
+  color:var(--tenant-primary)!important;
+}
+.tenant-themed .property-choice-card>b,
+.tenant-themed .property-back-button,
+.tenant-themed .report-card button{
+  color:color-mix(in srgb,var(--tenant-primary) 58%,#10232f)!important;
+  font-weight:700!important;
+}
+.tenant-themed .module-tabs button{
+  background:#fff!important;
+  color:#52616b!important;
+}
+.tenant-themed .module-tabs button:hover:not(.active){
+  background:#fff!important;
+  color:var(--tenant-primary)!important;
+}
+.tenant-themed .module-tabs button.active{
+  border-color:var(--tenant-primary)!important;
+  background:var(--tenant-primary)!important;
+  color:var(--tenant-primary-text)!important;
+  box-shadow:0 2px 8px color-mix(in srgb,var(--tenant-primary) 18%,transparent)!important;
+}
