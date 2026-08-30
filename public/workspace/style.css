@@ -825,3 +825,88 @@ img[data-agency-header][hidden]{display:none!important}
 .tenant-themed .panel-heading h3,.tenant-themed .toolbar h3,.tenant-themed .mini-stats strong,.tenant-themed .stat-card strong{color:var(--tenant-primary)!important}
 .tenant-themed .data-table thead,.tenant-themed .panel .data-table thead{background:var(--tenant-primary)!important}.tenant-themed .data-table thead th,.tenant-themed .panel .data-table thead th{background:transparent!important;color:var(--tenant-primary-text)!important}
 .tenant-themed .data-table tbody tr:hover>td{background:var(--tenant-soft)!important;color:var(--ink)!important}
+
+/* Workspace typography and high-readability white surfaces. */
+.tenant-themed{font-family:Aptos,"Segoe UI",Arial,sans-serif;background:#fff!important;color:var(--ink)}
+.tenant-themed .topbar h1,
+.tenant-themed .page-heading h2,
+.tenant-themed .welcome-row h2,
+.tenant-themed .dashboard-agency-identity h2{
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-size:18pt!important;
+  font-weight:700!important;
+  line-height:1.2!important;
+}
+.tenant-themed .page-heading p,
+.tenant-themed .welcome-row p,
+.tenant-themed .panel-heading p,
+.tenant-themed .dashboard-agency-identity small,
+.tenant-themed .dashboard-section-title>small,
+.tenant-themed .stocks-monitor-head p{
+  font-family:Aptos,"Segoe UI",Arial,sans-serif!important;
+  font-size:10pt!important;
+  font-weight:400!important;
+  line-height:1.45!important;
+}
+.tenant-themed .data-table th,
+.tenant-themed .panel table:not(.government-form table):not(.property-form-table):not(.physical-count-table):not(.disposal-table):not(.rsmi-official-table):not(.rsmi-recap-table) th{
+  font-family:Aptos,"Segoe UI",Arial,sans-serif!important;
+  font-size:9pt!important;
+  font-weight:700!important;
+  line-height:1.3!important;
+}
+.tenant-themed .data-table td,
+.tenant-themed .panel table:not(.government-form table):not(.property-form-table):not(.physical-count-table):not(.disposal-table):not(.rsmi-official-table):not(.rsmi-recap-table) td{
+  font-family:Aptos,"Segoe UI",Arial,sans-serif!important;
+  font-size:9pt!important;
+  font-weight:400;
+  line-height:1.4!important;
+}
+.tenant-themed .sidebar nav small{
+  color:color-mix(in srgb,var(--tenant-primary-text) 88%,transparent)!important;
+  font-family:Aptos,"Segoe UI",Arial,sans-serif;
+  font-weight:700;
+}
+.tenant-themed .sidebar nav button,
+.tenant-themed .sidebar-foot,
+.tenant-themed .brand p{
+  color:color-mix(in srgb,var(--tenant-primary-text) 82%,transparent)!important;
+}
+.tenant-themed .sidebar nav button:hover,
+.tenant-themed .sidebar nav button.active,
+.tenant-themed .sidebar nav button:hover span,
+.tenant-themed .sidebar nav button.active span{
+  color:var(--tenant-primary-text)!important;
+}
+.tenant-themed .content-shell,
+.tenant-themed main,
+.tenant-themed .dashboard-hero,
+.tenant-themed .running-inventory,
+.tenant-themed .stocks-monitor,
+.tenant-themed .metric-card,
+.tenant-themed .mini-stats>div,
+.tenant-themed .stat-card,
+.tenant-themed .panel,
+.tenant-themed .toolbar,
+.tenant-themed .process-line,
+.tenant-themed .report-card,
+.tenant-themed .property-choice-card,
+.tenant-themed .activity-strip>div,
+.tenant-themed .running-metrics article,
+.tenant-themed .dashboard-inventory-balance,
+.tenant-themed .inventory-item-search-row,
+.tenant-themed .report-filters{
+  background:#fff!important;
+  color:var(--ink)!important;
+}
+.tenant-themed .metric-card:hover,
+.tenant-themed .mini-stats>div:hover,
+.tenant-themed .stat-card:hover,
+.tenant-themed .report-card:hover,
+.tenant-themed .property-choice-card:hover,
+.tenant-themed .activity-strip>div:hover,
+.tenant-themed .panel .data-table tbody tr:hover>td,
+.tenant-themed .data-table tbody tr:hover>td{
+  background:#fff!important;
+  color:var(--ink)!important;
+}
