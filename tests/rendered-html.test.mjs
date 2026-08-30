@@ -58,6 +58,14 @@ test("packages the complete DMW-parity workspace and verified transfer data", as
     assert.match(engine, new RegExp(form.replace(".", "\\.")));
   }
   assert.match(hydration, /sinop-dmw-workspace-state-v1/);
+  for (const dashboardFeature of ["Connected users now", "PHILIPPINE STANDARD TIME", "Inventory Balance"]) {
+    assert.match(engine, new RegExp(dashboardFeature));
+  }
+  for (const settingFeature of ["Agency Information", "System Color Palette", "Inventory Costing Formula", "Create Department", "Add Plantilla", "Add Employee"]) {
+    assert.match(engine, new RegExp(settingFeature));
+  }
+  assert.match(hydration, /applySinopTenantTheme/);
+  assert.match(hydration, /tenant-primary-text/);
   assert.equal(actual, expected);
   assert.ok(expected === 568 || expected === 0);
 });

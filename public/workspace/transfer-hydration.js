@@ -17,26 +17,43 @@
   const parseJson = (value) => {
     try { return typeof value === "string" ? JSON.parse(value || "{}") : (value || {}); } catch { return {}; }
   };
+  const contrastText = (hex) => {
+    const value = String(hex || "").replace("#", "");
+    if (!/^[0-9a-f]{6}$/i.test(value)) return "#ffffff";
+    const [r, g, b] = [0, 2, 4].map((offset) => parseInt(value.slice(offset, offset + 2), 16) / 255).map((channel) => channel <= .03928 ? channel / 12.92 : ((channel + .055) / 1.055) ** 2.4);
+    return .2126 * r + .7152 * g + .0722 * b > .48 ? "#10232f" : "#ffffff";
+  };
 
   function applyTheme() {
-    const fallback = { agencyName: "Sinop Demo Agency", colors: ["#0F2942", "#059669"] };
+    const fallback = { agencyName: "Sinop Demo Agency", agencyAddress: "", colors: ["#0F2942", "#059669"], formula: "FIFO" };
     const theme = { ...fallback, ...parseJson(localStorage.getItem(THEME_KEY)) };
-    const colors = Array.isArray(theme.colors) && theme.colors.length >= 2 ? theme.colors : fallback.colors;
+    const colors = Array.isArray(theme.colors) && theme.colors.length >= 2 ? theme.colors.slice(0, 3) : fallback.colors;
+    const primary = colors[0]; const accent = colors[1]; const tertiary = colors[2] || accent;
+    document.body.classList.add("tenant-themed");
     window.stockCardEntityName = theme.agencyName || fallback.agencyName;
-    document.documentElement.style.setProperty("--navy", colors[0]);
-    document.documentElement.style.setProperty("--blue", colors[0]);
-    document.documentElement.style.setProperty("--teal", colors[1]);
-    document.documentElement.style.setProperty("--green", colors[1]);
+    document.documentElement.style.setProperty("--navy", primary);
+    document.documentElement.style.setProperty("--blue", primary);
+    document.documentElement.style.setProperty("--teal", accent);
+    document.documentElement.style.setProperty("--green", accent);
+    document.documentElement.style.setProperty("--tenant-primary", primary);
+    document.documentElement.style.setProperty("--tenant-accent", accent);
+    document.documentElement.style.setProperty("--tenant-tertiary", tertiary);
+    document.documentElement.style.setProperty("--tenant-third", tertiary);
+    document.documentElement.style.setProperty("--tenant-primary-text", contrastText(primary));
+    document.documentElement.style.setProperty("--tenant-accent-text", contrastText(accent));
+    document.documentElement.style.setProperty("--tenant-tertiary-text", contrastText(tertiary));
+    document.documentElement.style.setProperty("--tenant-soft", `color-mix(in srgb, ${accent} 11%, #ffffff)`);
     document.querySelectorAll("[data-agency-name]").forEach((node) => { node.textContent = window.stockCardEntityName; });
     document.querySelectorAll(".agency-brand-mark").forEach((node) => {
-      node.textContent = "S";
-      node.style.background = `linear-gradient(145deg, ${colors[0]}, ${colors[1]})`;
+      node.innerHTML = theme.logoPreview ? `<img src="${theme.logoPreview}" alt="${window.stockCardEntityName} logo">` : "S";
+      node.style.background = theme.logoPreview ? "#ffffff" : `linear-gradient(145deg, ${primary}, ${accent})`;
     });
     document.querySelectorAll("img[src='/agency-header-placeholder.png']").forEach((image) => {
       if (theme.headerPreview) image.src = theme.headerPreview;
       else image.style.display = "none";
     });
   }
+  window.applySinopTenantTheme = applyTheme;
 
   function applyState(state) {
     pos = state.pos || [];
