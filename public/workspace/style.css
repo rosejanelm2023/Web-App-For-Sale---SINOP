@@ -910,3 +910,48 @@ img[data-agency-header][hidden]{display:none!important}
   background:#fff!important;
   color:var(--ink)!important;
 }
+
+/* Final contrast guard for searchable inventory tables and form controls. */
+.tenant-themed .search,
+.tenant-themed .dashboard-stock-search,
+.tenant-themed .inventory-item-search-row{
+  background:#fff!important;
+  color:#41515c!important;
+}
+.tenant-themed input:not([type="color"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.tenant-themed select,
+.tenant-themed textarea,
+.tenant-themed .search input{
+  background:#fff!important;
+  color:#243640!important;
+  caret-color:#243640;
+}
+.tenant-themed input::placeholder,
+.tenant-themed textarea::placeholder,
+.tenant-themed .search input::placeholder{
+  color:#687781!important;
+  opacity:1!important;
+}
+.tenant-themed .data-table tbody,
+.tenant-themed .data-table tbody tr,
+.tenant-themed .data-table tbody td,
+.tenant-themed .panel .data-table tbody,
+.tenant-themed .panel .data-table tbody tr,
+.tenant-themed .panel .data-table tbody td{
+  background:#fff!important;
+  color:#243640!important;
+}
+.tenant-themed .data-table tbody tr:hover,
+.tenant-themed .data-table tbody tr:hover td,
+.tenant-themed .panel .data-table tbody tr:hover,
+.tenant-themed .panel .data-table tbody tr:hover td{
+  background:#fff!important;
+  color:#243640!important;
+}
+.tenant-themed .data-table tbody td strong,
+.tenant-themed .data-table tbody td .linkish{
+  color:var(--tenant-primary)!important;
+}
+.tenant-themed .data-table tbody td small{
+  color:#687781!important;
+}

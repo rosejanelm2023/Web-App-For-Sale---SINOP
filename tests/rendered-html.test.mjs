@@ -70,6 +70,7 @@ test("packages the complete DMW-parity workspace and verified transfer data", as
   assert.match(hydration, /tenant-primary-text/);
   assert.match(workspaceCss, /Strict tenant-palette enforcement/);
   assert.match(workspaceCss, /Workspace typography and high-readability white surfaces/);
+  assert.match(workspaceCss, /Final contrast guard for searchable inventory tables and form controls/);
   assert.match(workspaceCss, /font-size:18pt!important/);
   assert.match(workspaceCss, /font-size:10pt!important/);
   assert.match(workspaceCss, /font-size:9pt!important/);
