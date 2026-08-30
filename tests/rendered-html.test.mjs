@@ -58,6 +58,9 @@ test("packages the complete DMW-parity workspace and verified transfer data", as
   for (const form of ["Appendix 57", "Appendix 58", "Appendix 59", "Appendix 65", "Appendix 66", "Appendix 69", "Appendix 70", "Appendix 71", "Appendix 73", "Appendix 74", "Appendix 75", "Appendix 76", "Annex A.4"]) {
     assert.match(engine, new RegExp(form.replace(".", "\\.")));
   }
+  assert.match(engine, /forms-report-select/);
+  assert.match(engine, /const physicalReportOptions=\["Appendix 66 \(RCPI\)","Appendix 73 \(RPCPPE\)","Annex A\.4"\]/);
+  assert.match(engine, /Source records available for the three consolidated reports/);
   assert.match(hydration, /sinop-dmw-workspace-state-v1/);
   for (const dashboardFeature of ["Connected users now", "PHILIPPINE STANDARD TIME", "Inventory Balance"]) {
     assert.match(engine, new RegExp(dashboardFeature));

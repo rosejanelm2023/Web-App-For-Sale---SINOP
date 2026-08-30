@@ -39,6 +39,7 @@ const masters = {
 };
 let adminTab="Suppliers";
 let reportTab="Overview";
+let formTab="Appendix 57 (SLC)";
 let stockCardItemKey="";
 let suppliesLedgerItemKey="";
 let propertyCardKey="";
@@ -134,27 +135,21 @@ function reportsView(){
  return enhancedReports();
 }
 
+const formOptions=["RIS","RSMI","Appendix 57 (SLC)","Appendix 58 (SC)","Appendix 59 (ICS)","Appendix 65 (WMR)","Appendix 69 (PC)","Appendix 70 (PPELC)","Appendix 71 (PAR)","Appendix 74 (IIRUP)","Appendix 75 (RLSDDP)","Appendix 76 (PTR)","Semi-Expendable","Capital Outlay","Inventory Balance"];
+const physicalReportOptions=["Appendix 66 (RCPI)","Appendix 73 (RPCPPE)","Annex A.4"];
+function openReportDestination(key){
+  if(physicalReportOptions.includes(key)){
+    reportTab=key;
+    render("Reports");
+    return;
+  }
+  formTab=formOptions.includes(key)?key:formOptions[0];
+  render("Forms");
+}
+function rerenderReportSurface(){render(current==="Forms"?"Forms":"Reports")}
 function formsView(){
-  const eligibleStockCards=buildAppendix58Cards().length;
-  const semiUnits=propertyUnits.filter(unit=>unit.classification==="Semi-Expendable").length;
-  const capitalUnits=propertyUnits.filter(unit=>unit.classification==="Capital Outlay").length;
-  return `<section class="page-heading"><div><h2>Forms</h2><p>Open and prepare official inventory and property forms using saved records.</p></div></section>
-  <section class="report-grid forms-grid">
-    <article class="report-card"><span>SLC</span><div><h3>Appendix 57 — Supplies Ledger Card</h3><p>Accounting ledger for expendable-item receipts, issues, quantities, and costs.</p><small>${eligibleStockCards} eligible supplies ledger card${eligibleStockCards===1?"":"s"}</small></div><button data-open-report="Appendix 57 (SLC)">Open form →</button></article>
-    <article class="report-card"><span>SC</span><div><h3>Appendix 58 — Stock Card</h3><p>Stock Card for expendable items received through completed or approved IARs.</p><small>${eligibleStockCards} eligible stock card${eligibleStockCards===1?"":"s"}</small></div><button data-open-report="Appendix 58 (SC)">Open form →</button></article>
-    <article class="report-card"><span>ICS</span><div><h3>Appendix 59 — Inventory Custodian Slip</h3><p>Issue and print an ICS for each semi-expendable property unit.</p><small>${semiUnits} eligible semi-expendable record${semiUnits===1?"":"s"}</small></div><button data-open-report="Appendix 59 (ICS)">Open form →</button></article>
-    <article class="report-card"><span>RIS</span><div><h3>Requisition and Issue Slip</h3><p>Create, complete, view, and print requisition and issue slips.</p><small>Uses saved RIS records</small></div><button data-go="Requisition & Issue Slips">Open form →</button></article>
-    <article class="report-card"><span>PC</span><div><h3>Appendix 69 — Property Card</h3><p>Receipt, transfer, disposal, and balance history for each capital-outlay property record.</p><small>${capitalUnits} eligible PPE record${capitalUnits===1?"":"s"}</small></div><button data-open-report="Appendix 69 (PC)">Open form →</button></article>
-    <article class="report-card"><span>PPELC</span><div><h3>Appendix 70 — PPE Ledger Card</h3><p>Acquisition cost, depreciation, adjustment, and repair ledger for capital-outlay property.</p><small>${capitalUnits} eligible PPE record${capitalUnits===1?"":"s"}</small></div><button data-open-report="Appendix 70 (PPELC)">Open form →</button></article>
-    <article class="report-card"><span>PAR</span><div><h3>Appendix 71 — Property Acknowledgement Receipt</h3><p>Official issuance and accountability receipt for each Capital Outlay PPE unit.</p><small>${capitalUnits} eligible capital-outlay record${capitalUnits===1?"":"s"}</small></div><button data-open-report="Appendix 71 (PAR)">Open form →</button></article>
-    <article class="report-card"><span>WMR</span><div><h3>Appendix 65 — Waste Materials Report</h3><p>Document unserviceable or disposed property, disposal method, inspection, and record of sales.</p><small>Uses eligible property records</small></div><button data-open-report="Appendix 65 (WMR)">Open form →</button></article>
-    <article class="report-card"><span>IIRUP</span><div><h3>Appendix 74 — Inventory and Inspection Report of Unserviceable Property</h3><p>Detailed inventory, inspection, valuation, and disposal report for unserviceable property.</p><small>Uses eligible property records</small></div><button data-open-report="Appendix 74 (IIRUP)">Open form →</button></article>
-    <article class="report-card"><span>RLSDDP</span><div><h3>Appendix 75 — Report of Lost, Stolen, Damaged or Destroyed Property</h3><p>Prepare an incident report for a selected accountable property unit.</p><small>${semiUnits+capitalUnits} accountable property record${semiUnits+capitalUnits===1?"":"s"}</small></div><button data-open-report="Appendix 75 (RLSDDP)">Open form →</button></article>
-    <article class="report-card"><span>PTR</span><div><h3>Appendix 76 — Property Transfer Report</h3><p>Prepare and print a transfer report using selected capital-outlay property records.</p><small>${capitalUnits} eligible PPE record${capitalUnits===1?"":"s"}</small></div><button data-open-report="Appendix 76 (PTR)">Open form →</button></article>
-    <article class="report-card"><span>RCPI</span><div><h3>Appendix 66 — Report on the Physical Count of Inventories</h3><p>Remaining expendable balances grouped by inventory category with official signatories.</p><small>Uses completed IAR and RIS records</small></div><button data-open-report="Appendix 66 (RCPI)">Open form →</button></article>
-    <article class="report-card"><span>RPCPPE</span><div><h3>Appendix 73 — Report on the Physical Count of PPE</h3><p>Consolidated capital-outlay property records by PPE category.</p><small>${capitalUnits} capital-outlay record${capitalUnits===1?"":"s"}</small></div><button data-open-report="Appendix 73 (RPCPPE)">Open form →</button></article>
-    <article class="report-card"><span>A.4</span><div><h3>Annex A.4 — Semi-Expendable Property Registry</h3><p>Issued semi-expendable units grouped by property category.</p><small>${semiUnits} semi-expendable record${semiUnits===1?"":"s"}</small></div><button data-open-report="Annex A.4">Open form →</button></article>
-  </section>`;
+  if(!formOptions.includes(formTab))formTab=formOptions[0];
+  return `<section class="page-heading forms-heading"><div><h2>Forms</h2><p>Select the form or operational report you want to prepare using saved records.</p></div><label class="forms-report-picker">Form or report<select id="forms-report-select">${formOptions.map(option=>`<option ${option===formTab?"selected":""}>${option}</option>`).join("")}</select></label></section>${reportContent(formTab)}`;
 }
 
 const views={"Dashboard":dashboard,"Purchase Orders":purchaseOrders,"Inspection & Acceptance":iarView,"Requisition & Issue Slips":enhancedRIS,"Property Records":propertyRecordsView,"Admin Options":enhancedAdmin,"Forms":formsView,"Reports":enhancedReports,"RSMI Generation":rsmiGenerationView};
@@ -532,8 +527,8 @@ function transferProperty(index){
   const property=propertyUnits[index];
   if(!property)return;
   ptrSelectedKeys=[String(property.dbId||index)];
-  reportTab="Appendix 76 (PTR)";
-  render("Reports");
+  formTab="Appendix 76 (PTR)";
+  render("Forms");
 }
 
 function markPropertyUnserviceable(index){
@@ -669,36 +664,37 @@ function adminContent(){
 }
 
 function enhancedReports(){
-  const tabs=["Overview","RIS","RSMI","Appendix 57 (SLC)","Appendix 58 (SC)","Appendix 59 (ICS)","Appendix 65 (WMR)","Appendix 66 (RCPI)","Appendix 69 (PC)","Appendix 70 (PPELC)","Appendix 71 (PAR)","Appendix 73 (RPCPPE)","Appendix 74 (IIRUP)","Appendix 75 (RLSDDP)","Appendix 76 (PTR)","Annex A.4","Semi-Expendable","Capital Outlay","Inventory Balance"];
-  return `<section class="page-heading"><div><h2>Reports</h2><p>Filter, prepare, print, and export inventory and property monitoring reports.</p></div><div class="report-period"><label>Reporting month <input type="month"></label></div></section><div class="module-tabs report-tabs">${tabs.map(t=>`<button class="${reportTab===t?"active":""}" data-report-tab="${t}">${t}</button>`).join("")}</div>${reportContent()}`;
+  const tabs=["Overview",...physicalReportOptions];
+  if(!tabs.includes(reportTab))reportTab="Overview";
+  return `<section class="page-heading"><div><h2>Reports</h2><p>Prepare the consolidated physical-count and property registry reports.</p></div><div class="report-period"><label>Reporting month <input type="month"></label></div></section><div class="module-tabs report-tabs">${tabs.map(t=>`<button class="${reportTab===t?"active":""}" data-report-tab="${t}">${t}</button>`).join("")}</div>${reportContent(reportTab)}`;
 }
-function reportContent(){
-  if(reportTab==="Overview"){
-    const cards=[["RSMI","Report of Supplies and Materials Issued","Monthly report generated from completed, eligible RIS records.","RSMI Generation"],["RIS","Requisition and Issue Slips","Create, complete, print, and review requisition and issue slips.","Requisition & Issue Slips"],["SLC","Appendix 57 Supplies Ledger Card","Accounting ledger of expendable receipts, issues, balances, and costs.","Appendix 57 (SLC)"],["SC","Appendix 58 Stock Card","Expendable item receipts from completed IARs and issues from completed RIS records.","Appendix 58 (SC)"],["ICS","Appendix 59 Inventory Custodian Slip","Official issuance form for semi-expendable property units.","Appendix 59 (ICS)"],["PC","Appendix 69 Property Card","Receipt, transfer, disposal, and balance history for capital-outlay property.","Appendix 69 (PC)"],["PPELC","Appendix 70 PPE Ledger Card","Acquisition, depreciation, adjustments, and repair history for capital-outlay property.","Appendix 70 (PPELC)"],["PTR","Appendix 76 Property Transfer Report","Prepare a transfer report from selected capital-outlay property records.","Appendix 76 (PTR)"],["SE","Semi-Expendable Property Report","Individual units with source documents and accountability details.","Semi-Expendable"],["CO","Capital Outlay Property Report","PPE units with acquisition, assignment, and condition data.","Capital Outlay"],["IB","Inventory Balance Report","Stock In from completed IARs and Stock Out from completed RIS records.","Inventory Balance"]];
-    return `<section class="report-grid report-grid-five">${cards.map(r=>`<article class="report-card"><span>${r[0]}</span><div><h3>${r[1]}</h3><p>${r[2]}</p><small>Uses saved records only</small></div><button ${r[0]==="RSMI"?`data-go="RSMI Generation"`:r[0]==="RIS"?`data-go="Requisition & Issue Slips"`:`data-open-report="${r[3]}"`}>Open report →</button></article>`).join("")}</section><section class="panel"><div class="panel-heading"><div><h3>Reporting readiness</h3><p>Source records included in the selected period</p></div></div><div class="readiness"><div><b>${pos.filter(r=>r[6]==="Completed").length}</b><span>Completed POs</span></div><div><b>${iars.filter(r=>r[6]==="Completed").length}</b><span>Completed IARs</span></div><div><b>${risRecords.filter(r=>r.status==="Completed").length}</b><span>Completed RIS</span></div><div><b>${pos.filter(r=>r[6]==="Draft").length+iars.filter(r=>r[6]==="Draft").length+risRecords.filter(r=>r.status==="Draft").length}</b><span>Unposted records</span></div></div></section>`;
+function reportContent(selectedTab=reportTab){
+  if(selectedTab==="Overview"){
+    const cards=[["RCPI","Appendix 66 — Report on the Physical Count of Inventories","Remaining expendable balances grouped by inventory category with official signatories.","Appendix 66 (RCPI)"],["RPCPPE","Appendix 73 — Report on the Physical Count of PPE","Consolidated capital-outlay property records grouped by PPE category.","Appendix 73 (RPCPPE)"],["REG","Annex A.4 — Semi-Expendable Property Registry","Issued semi-expendable property units grouped by account category.","Annex A.4"]];
+    return `<section class="report-grid reports-overview-grid">${cards.map(r=>`<article class="report-card"><span>${r[0]}</span><div><h3>${r[1]}</h3><p>${r[2]}</p><small>Uses saved and accepted records only</small></div><button data-open-report="${r[3]}">Open report →</button></article>`).join("")}</section><section class="panel"><div class="panel-heading"><div><h3>Reporting readiness</h3><p>Source records available for the three consolidated reports</p></div></div><div class="readiness"><div><b>${buildInventoryBalanceRows().length}</b><span>Expendable balances</span></div><div><b>${propertyUnits.filter(unit=>unit.classification==="Capital Outlay").length}</b><span>Capital Outlay units</span></div><div><b>${propertyUnits.filter(unit=>unit.classification==="Semi-Expendable").length}</b><span>Semi-Expendable units</span></div><div><b>${iars.filter(r=>r[6]==="Completed").length}</b><span>Completed IARs</span></div></div></section>`;
   }
-  if(reportTab==="RSMI")return `<section class="panel"><div class="panel-heading"><div><h3>Generated RSMI reports</h3><p>View each finalized report and its included RIS records.</p></div><div><button class="secondary-button" data-export="rsmi">⇩ CSV</button> <button class="primary-button" data-go="RSMI Generation">Generate RSMI</button></div></div><div class="table-wrap"><table class="data-table"><thead><tr><th>RSMI number</th><th>Reporting period</th><th>Date prepared</th><th>Included RIS</th><th>Total issued cost</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rsmiRecords.map(r=>`<tr><td><strong class="linkish">${r.number}</strong></td><td>${r.period}</td><td>${r.prepared}</td><td>${r.ris.join(", ")}</td><td><strong>${peso.format(r.value)}</strong></td><td>${badge(r.status)}</td><td><div class="row-actions"><button>View RIS</button><button data-print>Print</button></div></td></tr>`).join("")}</tbody></table></div></section>`;
-  if(reportTab==="Appendix 57 (SLC)")return suppliesLedgerReport();
-  if(reportTab==="Appendix 58 (SC)")return stockCardReport();
-  if(reportTab==="Appendix 59 (ICS)")return inventoryCustodianSlipReport();
-  if(reportTab==="Appendix 65 (WMR)")return wasteMaterialsReport();
-  if(reportTab==="Appendix 66 (RCPI)")return rcpiReport();
-  if(reportTab==="Appendix 69 (PC)")return propertyCardReport();
-  if(reportTab==="Appendix 70 (PPELC)")return ppeLedgerReport();
-  if(reportTab==="Appendix 71 (PAR)")return propertyAcknowledgementReceiptReport();
-  if(reportTab==="Appendix 73 (RPCPPE)")return rpcppeReport();
-  if(reportTab==="Appendix 74 (IIRUP)")return unserviceablePropertyReport();
-  if(reportTab==="Appendix 75 (RLSDDP)")return lostStolenDamagedPropertyReport();
-  if(reportTab==="Appendix 76 (PTR)")return propertyTransferReport();
-  if(reportTab==="Annex A.4")return semiExpendableRegistryReport();
-  if(reportTab==="RIS")return reportShell("RIS Report","Filter by date range, number, item, office, employee, or status.",risReportTable());
-  if(reportTab==="Inventory Balance")return reportShell("Inventory Balance Report","Expendable items only, sorted A–Z. In quantities come from completed IAR items; Out quantities come from completed RIS item lines.",inventoryReportTable(),`<div class="inventory-item-search-row"><label class="search">⌕<input id="inventory-balance-search" placeholder="Search existing item name or stock number…" autocomplete="off"></label><span id="inventory-balance-search-count">Existing expendable items only</span></div>`);
-  const classification=reportTab==="Semi-Expendable"?"Semi-Expendable":"Capital Outlay";
-  return reportShell(`${classification} Property Report`,"Filter individual units by acquisition, source document, employee, office, location, condition, or status.",propertyTable(propertyUnits.filter(p=>p.classification===classification)));
+  if(selectedTab==="RSMI")return `<section class="panel"><div class="panel-heading"><div><h3>Generated RSMI reports</h3><p>View each finalized report and its included RIS records.</p></div><div><button class="secondary-button" data-export="rsmi">⇩ CSV</button> <button class="primary-button" data-go="RSMI Generation">Generate RSMI</button></div></div><div class="table-wrap"><table class="data-table"><thead><tr><th>RSMI number</th><th>Reporting period</th><th>Date prepared</th><th>Included RIS</th><th>Total issued cost</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rsmiRecords.map(r=>`<tr><td><strong class="linkish">${r.number}</strong></td><td>${r.period}</td><td>${r.prepared}</td><td>${r.ris.join(", ")}</td><td><strong>${peso.format(r.value)}</strong></td><td>${badge(r.status)}</td><td><div class="row-actions"><button>View RIS</button><button data-print>Print</button></div></td></tr>`).join("")}</tbody></table></div></section>`;
+  if(selectedTab==="Appendix 57 (SLC)")return suppliesLedgerReport();
+  if(selectedTab==="Appendix 58 (SC)")return stockCardReport();
+  if(selectedTab==="Appendix 59 (ICS)")return inventoryCustodianSlipReport();
+  if(selectedTab==="Appendix 65 (WMR)")return wasteMaterialsReport();
+  if(selectedTab==="Appendix 66 (RCPI)")return rcpiReport();
+  if(selectedTab==="Appendix 69 (PC)")return propertyCardReport();
+  if(selectedTab==="Appendix 70 (PPELC)")return ppeLedgerReport();
+  if(selectedTab==="Appendix 71 (PAR)")return propertyAcknowledgementReceiptReport();
+  if(selectedTab==="Appendix 73 (RPCPPE)")return rpcppeReport();
+  if(selectedTab==="Appendix 74 (IIRUP)")return unserviceablePropertyReport();
+  if(selectedTab==="Appendix 75 (RLSDDP)")return lostStolenDamagedPropertyReport();
+  if(selectedTab==="Appendix 76 (PTR)")return propertyTransferReport();
+  if(selectedTab==="Annex A.4")return semiExpendableRegistryReport();
+  if(selectedTab==="RIS")return reportShell("RIS Report","Filter by date range, number, item, office, employee, or status.",risReportTable(),"",selectedTab);
+  if(selectedTab==="Inventory Balance")return reportShell("Inventory Balance Report","Expendable items only, sorted A–Z. In quantities come from completed IAR items; Out quantities come from completed RIS item lines.",inventoryReportTable(),`<div class="inventory-item-search-row"><label class="search">⌕<input id="inventory-balance-search" placeholder="Search existing item name or stock number…" autocomplete="off"></label><span id="inventory-balance-search-count">Existing expendable items only</span></div>`,selectedTab);
+  const classification=selectedTab==="Semi-Expendable"?"Semi-Expendable":"Capital Outlay";
+  return reportShell(`${classification} Property Report`,"Filter individual units by acquisition, source document, employee, office, location, condition, or status.",propertyTable(propertyUnits.filter(p=>p.classification===classification)),"",selectedTab);
 }
-function reportShell(title,description,content,additionalFilters=""){
-  const filter=reportDateFilters[reportTab]||{from:"",to:"",search:"",status:"All statuses"};
-  reportDateFilters[reportTab]=filter;
+function reportShell(title,description,content,additionalFilters="",filterKey=reportTab){
+  const filter=reportDateFilters[filterKey]||{from:"",to:"",search:"",status:"All statuses"};
+  reportDateFilters[filterKey]=filter;
   return `<section class="panel"><div class="panel-heading"><div><h3>${title}</h3><p>${description}</p></div><div><button class="secondary-button" data-export="report">⇩ CSV</button> <button class="secondary-button" data-print>Print</button></div></div><div class="report-filters"><label>Date from<input id="report-date-from" data-report-filter="from" type="date" value="${escapeFormValue(filter.from)}" aria-label="Date from"></label><label>Date to<input id="report-date-to" data-report-filter="to" type="date" value="${escapeFormValue(filter.to)}" aria-label="Date to"></label><label>Search<input data-report-filter="search" value="${escapeFormValue(filter.search)}" placeholder="Document, item, office, employee…"></label><label>Status<select data-report-filter="status">${["All statuses","Available","Issued","Completed"].map(value=>`<option ${value===filter.status?"selected":""}>${value}</option>`).join("")}</select></label><button class="primary-button" id="apply-report-filters" type="button">Apply filters</button></div><p class="report-date-feedback" id="report-date-feedback" aria-live="polite"></p>${additionalFilters}${content}</section>`;
 }
 function risReportTable(){return `<div class="table-wrap"><table class="data-table"><thead><tr><th>RIS number</th><th>Date</th><th>Office</th><th>Requested by</th><th>Purpose</th><th>Items</th><th>Issued value</th><th>Status</th></tr></thead><tbody>${risRecords.map(r=>`<tr><td><strong class="linkish">${r.number}</strong></td><td>${r.date}</td><td>${r.office}</td><td>${r.requestedBy}</td><td>${r.purpose}</td><td>${r.items}</td><td>${peso.format(r.value)}</td><td>${badge(r.status)}</td></tr>`).join("")}</tbody></table></div>`}
@@ -1105,7 +1101,8 @@ function structureRenderedPropertyReports(){
 function bindEnhanced(){
   structureRenderedPropertyReports();
   document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>render(b.dataset.go));
-  document.querySelectorAll("[data-open-report]").forEach(b=>b.onclick=()=>{reportTab=b.dataset.openReport;render("Reports")});
+  document.querySelectorAll("[data-open-report]").forEach(b=>b.onclick=()=>openReportDestination(b.dataset.openReport));
+  document.querySelector("#forms-report-select")?.addEventListener("change",event=>{formTab=event.target.value;render("Forms")});
   if(window.sinopDashboardClock)clearInterval(window.sinopDashboardClock);
   const updatePhilippineClock=()=>{
     const now=new Date();
@@ -1155,8 +1152,8 @@ function bindEnhanced(){
     if(panel&&willOpen){panel.hidden=false;button.setAttribute("aria-expanded","true")}
   });
   document.querySelectorAll("[data-edit-property]").forEach(b=>b.onclick=()=>openPropertyForm(+b.dataset.editProperty));
-  document.querySelectorAll("[data-view-ics]").forEach(b=>b.onclick=()=>{const entry=propertyUnits[+b.dataset.viewIcs];icsPropertyKey=String(entry.dbId||b.dataset.viewIcs);reportTab="Appendix 59 (ICS)";render("Reports")});
-  document.querySelectorAll("[data-view-par]").forEach(b=>b.onclick=()=>{const entry=propertyUnits[+b.dataset.viewPar];parPropertyKey=String(entry.dbId||b.dataset.viewPar);reportTab="Appendix 71 (PAR)";render("Reports")});
+  document.querySelectorAll("[data-view-ics]").forEach(b=>b.onclick=()=>{const entry=propertyUnits[+b.dataset.viewIcs];icsPropertyKey=String(entry.dbId||b.dataset.viewIcs);formTab="Appendix 59 (ICS)";render("Forms")});
+  document.querySelectorAll("[data-view-par]").forEach(b=>b.onclick=()=>{const entry=propertyUnits[+b.dataset.viewPar];parPropertyKey=String(entry.dbId||b.dataset.viewPar);formTab="Appendix 71 (PAR)";render("Forms")});
   document.querySelectorAll("[data-transfer-property]").forEach(b=>b.onclick=()=>transferProperty(+b.dataset.transferProperty));
   document.querySelectorAll("[data-unserviceable-property]").forEach(b=>b.onclick=()=>markPropertyUnserviceable(+b.dataset.unserviceableProperty));
   document.querySelectorAll("[data-admin-tab]").forEach(b=>b.onclick=async()=>{adminTab=b.dataset.adminTab;if(adminTab==="Activity Log"&&window.reloadInventoryAuditLogs)await window.reloadInventoryAuditLogs();render("Admin Options")});
@@ -1212,18 +1209,18 @@ function bindEnhanced(){
   document.querySelector("#add-master")?.addEventListener("click",()=>openMasterForm(adminTab));
   document.querySelectorAll("[data-edit-master]").forEach(button=>button.onclick=()=>openMasterForm(adminTab,+button.dataset.editMaster));
   document.querySelectorAll("[data-report-tab]").forEach(b=>b.onclick=()=>{reportTab=b.dataset.reportTab;render("Reports")});
-  document.querySelectorAll("[data-open-report]").forEach(b=>b.onclick=()=>{reportTab=b.dataset.openReport;render("Reports")});
+  document.querySelectorAll("[data-open-report]").forEach(b=>b.onclick=()=>openReportDestination(b.dataset.openReport));
   document.querySelectorAll("[data-physical-report]").forEach(control=>control.addEventListener("change",event=>{
     const state=physicalReportStates[event.target.dataset.physicalReport];
     if(!state)return;
     state[event.target.dataset.physicalField]=event.target.value;
-    render("Reports");
+    rerenderReportSurface();
   }));
   document.querySelectorAll("[data-disposal-form]").forEach(control=>control.addEventListener("change",event=>{
     const state=disposalFormStates[event.target.dataset.disposalForm];
     if(!state)return;
     state[event.target.dataset.disposalField]=event.target.value;
-    render("Reports");
+    rerenderReportSurface();
   }));
   const filterInventoryBalance=()=>{
     const query=(document.querySelector("#inventory-balance-search")?.value||"").trim().toLowerCase();
@@ -1241,20 +1238,20 @@ function bindEnhanced(){
   };
   document.querySelector("#inventory-balance-search")?.addEventListener("input",filterInventoryBalance);
   if(document.querySelector("#inventory-balance-search"))filterInventoryBalance();
-  document.querySelectorAll("[data-stock-card]").forEach(button=>button.onclick=()=>{stockCardItemKey=button.dataset.stockCard;reportTab="Appendix 58 (SC)";render("Reports")});
-  document.querySelector("#stock-card-item-select")?.addEventListener("change",event=>{stockCardItemKey=event.target.value;render("Reports")});
-  document.querySelector("#slc-item-select")?.addEventListener("change",event=>{suppliesLedgerItemKey=event.target.value;render("Reports")});
-  document.querySelector("#property-card-select")?.addEventListener("change",event=>{propertyCardKey=event.target.value;render("Reports")});
-  document.querySelector("#ppe-ledger-select")?.addEventListener("change",event=>{ppeLedgerKey=event.target.value;render("Reports")});
-  document.querySelector("#par-property-select")?.addEventListener("change",event=>{parPropertyKey=event.target.value;render("Reports")});
-  document.querySelector("#ics-property-select")?.addEventListener("change",event=>{icsPropertyKey=event.target.value;render("Reports")});
+  document.querySelectorAll("[data-stock-card]").forEach(button=>button.onclick=()=>{stockCardItemKey=button.dataset.stockCard;formTab="Appendix 58 (SC)";render("Forms")});
+  document.querySelector("#stock-card-item-select")?.addEventListener("change",event=>{stockCardItemKey=event.target.value;rerenderReportSurface()});
+  document.querySelector("#slc-item-select")?.addEventListener("change",event=>{suppliesLedgerItemKey=event.target.value;rerenderReportSurface()});
+  document.querySelector("#property-card-select")?.addEventListener("change",event=>{propertyCardKey=event.target.value;rerenderReportSurface()});
+  document.querySelector("#ppe-ledger-select")?.addEventListener("change",event=>{ppeLedgerKey=event.target.value;rerenderReportSurface()});
+  document.querySelector("#par-property-select")?.addEventListener("change",event=>{parPropertyKey=event.target.value;rerenderReportSurface()});
+  document.querySelector("#ics-property-select")?.addEventListener("change",event=>{icsPropertyKey=event.target.value;rerenderReportSurface()});
   document.querySelectorAll("[data-ptr-state]").forEach(control=>control.addEventListener("input",event=>{
     const field=event.target.dataset.ptrState;
     ptrState[field]=event.target.value;
     const display=document.querySelector(`#ptr-${field}-display`);
     if(display)display.textContent=event.target.value||"______________";
   }));
-  document.querySelector('[data-ptr-state="type"]')?.addEventListener("change",()=>render("Reports"));
+  document.querySelector('[data-ptr-state="type"]')?.addEventListener("change",rerenderReportSurface);
   document.querySelectorAll("[data-ptr-signatory]").forEach(control=>control.addEventListener("change",event=>{
     const id=`ptr-${event.target.dataset.ptrSignatory}`;
     const name=document.querySelector(`#${id}-name`);
@@ -1265,7 +1262,7 @@ function bindEnhanced(){
   document.querySelectorAll("[data-ptr-property]").forEach(control=>control.addEventListener("change",event=>{
     const key=event.target.dataset.ptrProperty;
     ptrSelectedKeys=event.target.checked?[...new Set([...ptrSelectedKeys,key])]:ptrSelectedKeys.filter(value=>value!==key);
-    render("Reports");
+    rerenderReportSurface();
   }));
   document.querySelector("#sc-employee-select")?.addEventListener("change",event=>{
     const option=event.target.selectedOptions[0];
@@ -1311,7 +1308,7 @@ function bindEnhanced(){
     return valid;
   };
   document.querySelectorAll("[data-report-filter]").forEach(control=>{
-    const save=()=>{const filter=reportDateFilters[reportTab]||(reportDateFilters[reportTab]={from:"",to:"",search:"",status:"All statuses"});filter[control.dataset.reportFilter]=control.value;syncReportDateRange()};
+    const save=()=>{const activeReportKey=current==="Forms"?formTab:reportTab;const filter=reportDateFilters[activeReportKey]||(reportDateFilters[activeReportKey]={from:"",to:"",search:"",status:"All statuses"});filter[control.dataset.reportFilter]=control.value;syncReportDateRange()};
     control.addEventListener(control.type==="text"?"input":"change",save);
   });
   syncReportDateRange();

@@ -992,3 +992,35 @@ img[data-agency-header][hidden]{display:none!important}
   color:var(--tenant-primary-text)!important;
   box-shadow:0 2px 8px color-mix(in srgb,var(--tenant-primary) 18%,transparent)!important;
 }
+
+/* Forms selector and three-report overview. */
+.forms-heading{align-items:flex-end;gap:24px}
+.forms-report-picker{
+  display:grid;
+  gap:7px;
+  width:min(430px,100%);
+  color:#52616b;
+  font:700 9pt Aptos,"Segoe UI",Arial,sans-serif;
+}
+.forms-report-picker select{
+  width:100%;
+  min-height:46px;
+  padding:0 42px 0 14px;
+  border:1px solid color-mix(in srgb,var(--tenant-primary) 22%,#fff)!important;
+  border-radius:10px;
+  background:#fff!important;
+  color:#243640!important;
+  font:400 9pt Aptos,"Segoe UI",Arial,sans-serif!important;
+  cursor:pointer;
+}
+.forms-report-picker select:focus{
+  border-color:var(--tenant-primary)!important;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--tenant-primary) 14%,transparent)!important;
+  outline:0;
+}
+.reports-overview-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:900px){
+  .forms-heading{align-items:stretch;flex-direction:column}
+  .forms-report-picker{width:100%}
+  .reports-overview-grid{grid-template-columns:1fr}
+}
