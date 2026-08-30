@@ -19,6 +19,8 @@ await cp(resolve(root, "static/app.js"), resolve(dist, "client/app.js"));
 await cp(resolve(root, "static/supabase-client.js"), resolve(dist, "client/supabase-client.js"));
 await cp(resolve(root, "static/supabase-integration.js"), resolve(dist, "client/supabase-integration.js"));
 await cp(resolve(root, "public/favicon.svg"), resolve(dist, "client/favicon.svg"));
+await cp(resolve(root, "public/workspace"), resolve(dist, "client/workspace"), { recursive: true });
+await cp(resolve(root, "public/data"), resolve(dist, "client/data"), { recursive: true });
 await cp(resolve(root, ".openai/hosting.json"), resolve(dist, ".openai/hosting.json"));
 
 let envText = "";

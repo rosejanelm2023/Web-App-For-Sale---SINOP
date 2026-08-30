@@ -32,3 +32,32 @@ test("keeps the duplicate disconnected from the DMW backend by default", async (
   assert.match(config, /"publishableKey":""/);
   assert.match(server, /env\.ASSETS\.fetch/);
 });
+
+test("packages the complete DMW-parity workspace and verified transfer data", async () => {
+  const [html, engine, hydration] = await Promise.all([
+    readFile(new URL("dist/client/workspace/index.html", root), "utf8"),
+    readFile(new URL("dist/client/workspace/app.js", root), "utf8"),
+    readFile(new URL("dist/client/workspace/transfer-hydration.js", root), "utf8"),
+  ]);
+  let transfer;
+  try {
+    transfer = await readFile(new URL("dist/client/data/dmw-data-transfer.json", root), "utf8");
+  } catch {
+    transfer = await readFile(new URL("dist/client/data/dmw-data-transfer.sample.json", root), "utf8");
+  }
+  const packageData = JSON.parse(transfer);
+  const expected = Object.values(packageData.record_counts).reduce((sum, count) => sum + count, 0);
+  const actual = Object.values(packageData.data).reduce((sum, rows) => sum + rows.length, 0);
+
+  assert.match(html, /Sinop Inventory Workspace/);
+  assert.match(html, /transfer-hydration\.js/);
+  for (const module of ["Purchase Orders", "Inspection & Acceptance", "Property Records", "Admin Options", "Forms", "Reports"]) {
+    assert.match(engine, new RegExp(module.replace(/[&]/g, "&")));
+  }
+  for (const form of ["Appendix 57", "Appendix 58", "Appendix 59", "Appendix 65", "Appendix 66", "Appendix 69", "Appendix 70", "Appendix 71", "Appendix 73", "Appendix 74", "Appendix 75", "Appendix 76", "Annex A.4"]) {
+    assert.match(engine, new RegExp(form.replace(".", "\\.")));
+  }
+  assert.match(hydration, /sinop-dmw-workspace-state-v1/);
+  assert.equal(actual, expected);
+  assert.ok(expected === 568 || expected === 0);
+});

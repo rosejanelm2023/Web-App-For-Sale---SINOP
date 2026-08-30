@@ -50,3 +50,8 @@ next-env.d.ts
 /static/dmw-logo.svg
 /static/dmw-logo-embroidered.png
 /public/og.png
+
+# Real agency transfer packages stay local. The public repository uses the
+# schema-compatible sample package instead.
+/public/data/dmw-data-transfer.json
+/public/data/dmw-data-transfer-verification.json
