@@ -1053,3 +1053,84 @@ img[data-agency-header][hidden]{display:none!important}
   body:has(.qr-label-preview) .qr-label-preview{width:82mm;max-width:none;margin:0 auto;padding:6mm;border:1.5px solid #000;border-radius:0}
   body:has(.qr-label-preview) .qr-label-preview canvas{width:55mm!important;height:55mm!important}
 }
+
+/* Custom legal-size inventory sticker builder. */
+.sticker-builder{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:18px;margin-bottom:20px}
+.sticker-config,.sticker-property-picker{overflow:hidden}
+.sticker-field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:18px 20px;border-top:1px solid #e1e8ec}
+.sticker-field-grid label{display:flex;align-items:center;gap:8px;min-height:34px;padding:7px 9px;border:1px solid #e0e7eb;border-radius:8px;background:#fff;color:#324652;font:700 9pt Aptos,"Segoe UI",Arial,sans-serif}
+.sticker-field-grid input,.sticker-property-option input{accent-color:var(--tenant-primary)}
+.sticker-extra-fields{display:grid;gap:10px;padding:0 20px 20px}
+.sticker-extra-fields label{display:grid;gap:5px;color:#52616b;font:700 9pt Aptos,"Segoe UI",Arial,sans-serif}
+.sticker-extra-fields input{width:100%;min-height:40px;padding:8px 10px;border:1px solid #dce5e9;border-radius:8px;background:#fff;color:#243640}
+.sticker-picker-toolbar{display:flex;flex-wrap:wrap;gap:8px;padding:14px 16px;border-top:1px solid #e1e8ec;border-bottom:1px solid #e1e8ec}
+.sticker-picker-toolbar .search{flex:1 1 220px;width:auto}
+.sticker-picker-toolbar select{min-height:36px;padding:0 10px;border:1px solid #dce5e9;border-radius:7px;background:#fff;color:#243640}
+.sticker-property-list{max-height:330px;overflow:auto;padding:8px}
+.sticker-property-option{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;color:#243640;cursor:pointer}
+.sticker-property-option:hover{background:var(--tenant-soft)}
+.sticker-property-option>span{display:grid;flex:1;gap:3px}
+.sticker-property-option strong{font:700 9pt Aptos,"Segoe UI",Arial,sans-serif}
+.sticker-property-option small{color:#687781;font:400 8pt Aptos,"Segoe UI",Arial,sans-serif}
+.sticker-property-option>b{padding:3px 6px;border-radius:5px;background:#fff1c9;color:#8c5b00;font:800 7pt Aptos,"Segoe UI",Arial,sans-serif}
+.sticker-preview-heading{display:flex;align-items:center;justify-content:space-between;margin:22px 0 12px}
+.sticker-preview-heading h3{margin:0;color:var(--tenant-primary);font:700 15pt Georgia,"Times New Roman",serif}
+.sticker-preview-heading p{margin:4px 0 0;color:#687781;font:400 9pt Aptos,"Segoe UI",Arial,sans-serif}
+.sticker-preview-heading>span{padding:6px 10px;border-radius:18px;background:var(--tenant-soft);color:var(--tenant-primary);font:700 8pt Aptos,"Segoe UI",Arial,sans-serif}
+.inventory-sticker-sheet{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:20px;padding:12px;border:1px dashed #aab8c1;background:#f7f9fa}
+.inventory-sticker{display:grid;grid-template-columns:minmax(0,1fr) 30%;grid-template-rows:minmax(0,1fr) auto;min-height:210px;overflow:hidden;border:1px solid #1c2a33;background:#fff;color:#111}
+.inventory-sticker-details{min-width:0;border-right:1px solid #1c2a33}
+.inventory-sticker-row{display:grid;grid-template-columns:42% minmax(0,1fr);min-height:20px;border-bottom:1px solid #9da8ae;font-family:Arial,sans-serif;font-size:7.5pt;line-height:1.15}
+.inventory-sticker-row:last-child{border-bottom:0}
+.inventory-sticker-row b,.inventory-sticker-row span{display:flex;align-items:center;padding:3px 4px;overflow-wrap:anywhere}
+.inventory-sticker-row b{border-right:1px solid #c4ccd0;font-weight:800}
+.inventory-sticker aside{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;padding:5px;text-align:center}
+.inventory-sticker aside canvas{width:82px!important;height:82px!important;max-width:100%}
+.inventory-sticker aside img{width:30px;height:30px;object-fit:contain}
+.inventory-sticker aside>strong{display:grid;width:28px;height:28px;place-items:center;border-radius:50%;background:var(--tenant-primary);color:var(--tenant-primary-text);font:800 8pt Aptos,"Segoe UI",Arial,sans-serif}
+.inventory-sticker aside small{max-width:100%;font:700 5.5pt Aptos,"Segoe UI",Arial,sans-serif;overflow-wrap:anywhere}
+.inventory-sticker aside em{padding:2px 4px;border:1px solid #9a6500;color:#8c5b00;font:800 5pt Aptos,"Segoe UI",Arial,sans-serif;font-style:normal}
+.inventory-sticker footer{display:grid;grid-column:1/-1;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid #1c2a33}
+.inventory-sticker footer div{display:grid;min-height:34px;padding:4px;text-align:center}
+.inventory-sticker footer div+div{border-left:1px solid #1c2a33}
+.inventory-sticker footer b{font:800 6.5pt Arial,sans-serif}
+.inventory-sticker footer span{align-self:end;border-top:1px solid #9da8ae;padding-top:2px;font:400 6pt Arial,sans-serif}
+
+/* Dashboard accountability-renewal alert. */
+.renewal-alert{margin-bottom:20px;border:1px solid color-mix(in srgb,#d78a00 38%,#fff)!important;background:#fffdf7!important}
+.renewal-count{padding:6px 10px;border-radius:18px;background:#fff1c9;color:#8c5b00;font:800 8pt Aptos,"Segoe UI",Arial,sans-serif}
+.renewal-list{display:grid;border-top:1px solid #f0dfb7}
+.renewal-list article{display:flex;align-items:center;gap:12px;padding:13px 16px}
+.renewal-list article+article{border-top:1px solid #f0e6cc}
+.renewal-warning{display:grid;flex:0 0 32px;width:32px;height:32px;place-items:center;border-radius:50%;background:#fff1c9;color:#9a6500;font-weight:900}
+.renewal-list article>div{display:grid;flex:1;gap:3px}
+.renewal-list article strong{color:#243640;font:700 9pt Aptos,"Segoe UI",Arial,sans-serif}
+.renewal-list article small,.renewal-list article p{margin:0;color:#687781;font:400 8pt Aptos,"Segoe UI",Arial,sans-serif}
+.renewal-list article p b{color:#52616b}
+.renewal-scope-note{display:grid;gap:4px;margin-bottom:18px;padding:12px;border:1px solid #d9e5ea;border-radius:8px;background:#f7fafb;color:#52616b;font:400 9pt/1.4 Aptos,"Segoe UI",Arial,sans-serif}
+.renewal-scope-note strong{color:#243640}
+.renewal-preview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.renewal-preview>div{display:grid;gap:5px;padding:10px;border:1px solid #e0e7eb;border-radius:8px;background:#fff}
+.renewal-preview span{color:#687781;font:400 8pt Aptos,"Segoe UI",Arial,sans-serif}
+.renewal-preview strong{color:#243640;font:700 9pt Aptos,"Segoe UI",Arial,sans-serif}
+@media(max-width:980px){.sticker-builder{grid-template-columns:1fr}.inventory-sticker-sheet{grid-template-columns:1fr}.renewal-list article{align-items:flex-start;flex-wrap:wrap}.renewal-list article button{margin-left:44px}.renewal-preview{grid-template-columns:1fr}}
+
+@page sticker-legal{size:legal portrait;margin:6mm}
+@media print{
+  body:has(.inventory-sticker-sheet)>.app-shell .sidebar,
+  body:has(.inventory-sticker-sheet)>.app-shell .topbar,
+  body:has(.inventory-sticker-sheet) main>*:not(.inventory-sticker-sheet){display:none!important}
+  body:has(.inventory-sticker-sheet) .content-shell{margin:0!important}
+  body:has(.inventory-sticker-sheet) main{padding:0!important}
+  .inventory-sticker-sheet{page:sticker-legal;display:grid!important;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(6,52mm);gap:2mm;width:100%;margin:0;padding:0;border:0;background:#fff;break-after:page}
+  .inventory-sticker-sheet:last-child{break-after:auto}
+  .inventory-sticker{min-height:0;height:52mm;break-inside:avoid;border:1px solid #000}
+  .inventory-sticker-row{min-height:0;font-size:6.2pt;line-height:1.02}
+  .inventory-sticker-row b,.inventory-sticker-row span{padding:1.2mm 1mm}
+  .inventory-sticker aside{padding:1mm}
+  .inventory-sticker aside canvas{width:24mm!important;height:24mm!important}
+  .inventory-sticker aside img{width:8mm;height:8mm}
+  .inventory-sticker aside small{font-size:4.8pt}
+  .inventory-sticker footer div{min-height:9mm;padding:1mm}
+  .inventory-sticker footer b{font-size:5.7pt}.inventory-sticker footer span{font-size:5.3pt}
+}

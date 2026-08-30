@@ -176,6 +176,7 @@
       state = mapTransfer(bundle);
     }
     applyState(state);
+    ensureRenewalTestProperty();
     window.inventoryAccess = { isSuperAdmin: true, canWrite: true, canDelete: true, canUnpost: true, profile: { id: "sinop-superadmin", role: "super_admin", full_name: "Sinop Superadmin" } };
     window.inventoryUserProfiles = [{ id: "sinop-superadmin", email: "superadmin@sinop.local", full_name: "Sinop Superadmin", role: "super_admin", active: true }];
     window.inventoryAuditLogs = [];

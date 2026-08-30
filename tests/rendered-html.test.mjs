@@ -53,7 +53,7 @@ test("packages the complete DMW-parity workspace and verified transfer data", as
 
   assert.match(html, /Sinop Inventory Workspace/);
   assert.match(html, /transfer-hydration\.js/);
-  for (const module of ["Purchase Orders", "Inspection & Acceptance", "Property Records", "Admin Options", "Forms", "Reports"]) {
+  for (const module of ["Purchase Orders", "Inspection & Acceptance", "Property Records", "Inventory Sticker", "Admin Options", "Forms", "Reports"]) {
     assert.match(engine, new RegExp(module.replace(/[&]/g, "&")));
   }
   for (const form of ["Appendix 57", "Appendix 58", "Appendix 59", "Appendix 65", "Appendix 66", "Appendix 69", "Appendix 70", "Appendix 71", "Appendix 73", "Appendix 74", "Appendix 75", "Appendix 76", "Annex A.4"]) {
@@ -64,6 +64,10 @@ test("packages the complete DMW-parity workspace and verified transfer data", as
   assert.match(engine, /Source records available for the three consolidated reports/);
   assert.match(engine, /data-generate-property-qr/);
   assert.match(engine, /sinop:\/\/property\//);
+  assert.match(engine, /twelve side-by-side stickers per legal-size sheet/);
+  assert.match(engine, /test-renewal-property-001/);
+  assert.match(engine, /data-renew-property/);
+  assert.match(engine, /renewalDueIsoDate/);
   assert.match(html, /qrcode\.min\.js/);
   assert.ok(qrLibrary.length > 10000);
   assert.match(hydration, /sinop-dmw-workspace-state-v1/);
@@ -80,6 +84,7 @@ test("packages the complete DMW-parity workspace and verified transfer data", as
   assert.match(workspaceCss, /Workspace typography and high-readability white surfaces/);
   assert.match(workspaceCss, /Final contrast guard for searchable inventory tables and form controls/);
   assert.match(workspaceCss, /Final readable text treatment for navigation tabs and white action cards/);
+  assert.match(workspaceCss, /@page sticker-legal\{size:legal portrait/);
   assert.match(workspaceCss, /font-size:18pt!important/);
   assert.match(workspaceCss, /font-size:10pt!important/);
   assert.match(workspaceCss, /font-size:9pt!important/);
