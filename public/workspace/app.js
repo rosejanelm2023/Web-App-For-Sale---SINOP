@@ -166,6 +166,23 @@ function reportsView(){
 }
 
 const formOptions=["RIS","RSMI","Appendix 57 (SLC)","Appendix 58 (SC)","Appendix 59 (ICS)","Appendix 65 (WMR)","Appendix 69 (PC)","Appendix 70 (PPELC)","Appendix 71 (PAR)","Appendix 74 (IIRUP)","Appendix 75 (RLSDDP)","Appendix 76 (PTR)","Semi-Expendable","Capital Outlay","Inventory Balance"];
+const formOptionLabels={
+  RIS:"Appendix 63 : Requisition and Issue Slip (RIS)",
+  RSMI:"Appendix 64 : Report of Supplies and Materials Issued (RSMI)",
+  "Appendix 57 (SLC)":"Appendix 57 : Supplies Ledger Card (SLC)",
+  "Appendix 58 (SC)":"Appendix 58 : Stock Card (SC)",
+  "Appendix 59 (ICS)":"Appendix 59 : Inventory Custodian Slip (ICS)",
+  "Appendix 65 (WMR)":"Appendix 65 : Waste Materials Report (WMR)",
+  "Appendix 69 (PC)":"Appendix 69 : Property Card (PC)",
+  "Appendix 70 (PPELC)":"Appendix 70 : Property, Plant and Equipment Ledger Card (PPELC)",
+  "Appendix 71 (PAR)":"Appendix 71 : Property Acknowledgement Receipt (PAR)",
+  "Appendix 74 (IIRUP)":"Appendix 74 : Inventory and Inspection Report of Unserviceable Property (IIRUP)",
+  "Appendix 75 (RLSDDP)":"Appendix 75 : Report of Lost, Stolen, Damaged or Destroyed Property (RLSDDP)",
+  "Appendix 76 (PTR)":"Appendix 76 : Property Transfer Report (PTR)",
+  "Semi-Expendable":"Semi-Expendable Property Report",
+  "Capital Outlay":"Capital Outlay Property Report",
+  "Inventory Balance":"Inventory Balance Report"
+};
 const physicalReportOptions=["Appendix 66 (RCPI)","Appendix 73 (RPCPPE)","Annex A.4"];
 function openReportDestination(key){
   if(physicalReportOptions.includes(key)){
@@ -179,7 +196,7 @@ function openReportDestination(key){
 function rerenderReportSurface(){render(current==="Forms"?"Forms":"Reports")}
 function formsView(){
   if(!formOptions.includes(formTab))formTab=formOptions[0];
-  return `<section class="page-heading forms-heading"><div><h2>Forms</h2><p>Select the form or operational report you want to prepare using saved records.</p></div><label class="forms-report-picker">Form or report<select id="forms-report-select">${formOptions.map(option=>`<option ${option===formTab?"selected":""}>${option}</option>`).join("")}</select></label></section>${reportContent(formTab)}`;
+  return `<section class="page-heading forms-heading"><div><h2>Forms</h2><p>Select the form or operational report you want to prepare using saved records.</p></div><label class="forms-report-picker">Form or report<select id="forms-report-select">${formOptions.map(option=>`<option value="${escapeFormValue(option)}" ${option===formTab?"selected":""}>${escapeFormValue(formOptionLabels[option]||option)}</option>`).join("")}</select></label></section>${reportContent(formTab)}`;
 }
 
 const views={"Dashboard":dashboard,"Purchase Orders":purchaseOrders,"Inspection & Acceptance":iarView,"Requisition & Issue Slips":enhancedRIS,"Property Records":propertyRecordsView,"Inventory Sticker":inventoryStickerView,"Admin Options":enhancedAdmin,"Forms":formsView,"Reports":enhancedReports,"RSMI Generation":rsmiGenerationView};
@@ -962,16 +979,31 @@ function propertyCardReport(){
   if(!entries.some(entry=>entry.key===propertyCardKey))propertyCardKey=entries[0].key;
   const unit=entries.find(entry=>entry.key===propertyCardKey).unit;
   const amount=Number(unit.cost||0).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2});
-  const transaction=`<tr><td>${escapeFormValue(unit.date)}</td><td>${escapeFormValue(unit.parNumber||unit.iar||unit.po)}</td><td class="number-cell">1</td><td></td><td>${escapeFormValue(unit.employee||unit.office)}</td><td class="number-cell">1</td><td class="number-cell">${amount}</td><td>${escapeFormValue(unit.status||"Available")}</td></tr>`;
-  const blanks=Array.from({length:17},()=>`<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`).join("");
+  const accountabilityTimeline=propertyAccountabilityTimeline(unit);
+  const iarReference=unit.iar?`IAR No.: ${unit.iar}`:unit.po?`PO No.: ${unit.po}`:"";
+  const receiptRow=`<tr><td>${escapeFormValue(unit.date)}</td><td>${escapeFormValue(iarReference)}</td><td class="number-cell">1</td><td></td><td></td><td class="number-cell">1</td><td class="number-cell">${amount}</td><td>Received</td></tr>`;
+  const accountabilityRows=accountabilityTimeline.map(entry=>`<tr><td>${escapeFormValue(entry.date)}</td><td>${escapeFormValue(`${entry.label} No.: ${entry.documentNumber}`)}</td><td></td><td class="number-cell">${entry.status==="Issued"?"1":""}</td><td>${escapeFormValue(entry.receiver||unit.office)}</td><td class="number-cell">1</td><td></td><td>${escapeFormValue(entry.status)}</td></tr>`).join("");
+  const blanks=Array.from({length:Math.max(0,17-accountabilityTimeline.length)},()=>`<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`).join("");
   return `<section class="page-heading no-print"><div><h2>Appendix 69 — Property Card</h2><p>Property Card for every accepted semi-expendable and capital-outlay unit.</p></div><button class="primary-button" data-print>Print property card</button></section>
   <section class="panel stock-card-selector no-print"><label>View property card${propertySelector(entries,propertyCardKey,"property-card-select")}</label><div><strong>${entries.length}</strong><span>accepted property record${entries.length===1?"":"s"}</span></div></section>
   <article class="property-official-form property-card-form">
     <div class="property-form-appendix">Appendix 69</div><img class="property-form-header" src="/agency-header-placeholder.png" alt="Your Agency official header"><h1>PROPERTY CARD</h1>
     <div class="property-form-meta two-column"><p>Entity Name: <strong>${escapeFormValue(window.stockCardEntityName||"Your Agency")}</strong></p><p>Fund Cluster: <strong>${escapeFormValue(unit.fundSource||"Regular Fund 01")}</strong></p></div>
     <div class="property-form-meta property-card-details"><p>Property, Plant and Equipment: <strong>${escapeFormValue(unit.item)}</strong></p><p>Property Number: <strong>${escapeFormValue(unit.number||"____________________")}</strong></p><p class="wide">Description: <strong>${escapeFormValue(unit.description||[unit.brand,unit.model,unit.serial&&`Serial ${unit.serial}`].filter(Boolean).join(" · ")||unit.item)}</strong></p></div>
-    <table class="property-form-table property-card-table"><colgroup><col><col><col><col><col><col><col><col></colgroup><thead><tr><th rowspan="2">Date</th><th rowspan="2">Reference/<br>PAR No.</th><th>Receipt</th><th colspan="2">Issue/Transfer/Disposal</th><th>Balance</th><th rowspan="2">Amount</th><th rowspan="2">Remarks</th></tr><tr><th>Qty.</th><th>Qty.</th><th>Office/Officer</th><th>Qty.</th></tr></thead><tbody>${transaction}${blanks}</tbody></table>
+    <table class="property-form-table property-card-table"><colgroup><col><col><col><col><col><col><col><col></colgroup><thead><tr><th rowspan="2">Date</th><th rowspan="2">Reference/<br>ICS / PAR No.</th><th>Receipt</th><th colspan="2">Issue/Transfer/Disposal</th><th>Balance</th><th rowspan="2">Amount</th><th rowspan="2">Remarks</th></tr><tr><th>Qty.</th><th>Qty.</th><th>Office/Officer</th><th>Qty.</th></tr></thead><tbody>${receiptRow}${accountabilityRows}${blanks}</tbody></table>
   </article>`;
+}
+
+function propertyAccountabilityTimeline(unit){
+  const semi=unit.classification==="Semi-Expendable";
+  const label=semi?"ICS":"PAR";
+  const currentDocument=String(semi?unit.icsNumber||"":unit.parNumber||"");
+  if(!currentDocument)return [];
+  const history=Array.isArray(unit.renewalHistory)?unit.renewalHistory.filter(entry=>entry&&entry.documentNumber):[];
+  if(!history.length)return [{date:unit.issuedDate||unit.date||"",documentNumber:currentDocument,receiver:unit.employee||unit.office||"",status:"Issued",label}];
+  const timeline=[{date:unit.issuedDate||unit.date||"",documentNumber:String(history[0].documentNumber),receiver:history[0].receiver||unit.office||"",status:"Issued",label}];
+  history.forEach((renewal,index)=>{const next=history[index+1];const renewalDate=renewal.date||unit.issuedDate||unit.date||"";timeline.push({date:/^\d{4}-\d{2}-\d{2}$/.test(renewalDate)?renewalDateLabel(renewalDate):renewalDate,documentNumber:String(next?.documentNumber||currentDocument),receiver:next?.receiver||unit.employee||unit.office||"",status:"Renewed",label})});
+  return timeline;
 }
 
 function ppeLedgerReport(){
@@ -981,11 +1013,11 @@ function ppeLedgerReport(){
   const unit=entries.find(entry=>entry.key===ppeLedgerKey).unit;
   const cost=Number(unit.cost||0).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2});
   const reference=unit.iar?`IAR No.: ${unit.iar}`:unit.po?`PO No.: ${unit.po}`:"";
-  const hasIcsIssue=unit.classification==="Semi-Expendable"&&Boolean(unit.icsNumber);
-  const receiptRow=`<tr><td>${escapeFormValue(unit.date)}</td><td>${escapeFormValue(reference)}</td><td class="number-cell">1</td><td class="number-cell">${cost}</td><td class="number-cell">${cost}</td><td></td><td></td><td>${hasIcsIssue?"":escapeFormValue(unit.status&&unit.status!=="Available"?unit.status:"")}</td><td class="number-cell">${cost}</td><td></td><td></td></tr>`;
-  const issueRow=hasIcsIssue?`<tr><td>${escapeFormValue(unit.issuedDate||"")}</td><td>${escapeFormValue(`ICS No.: ${unit.icsNumber}`)}</td><td></td><td></td><td></td><td></td><td></td><td>Issued</td><td></td><td></td><td></td></tr>`:"";
-  const transactions=receiptRow+issueRow;
-  const blanks=Array.from({length:18-(hasIcsIssue?1:0)},()=>`<tr>${Array.from({length:11},()=>"<td>&nbsp;</td>").join("")}</tr>`).join("");
+  const accountabilityTimeline=propertyAccountabilityTimeline(unit);
+  const receiptRow=`<tr><td>${escapeFormValue(unit.date)}</td><td>${escapeFormValue(reference)}</td><td class="number-cell">1</td><td class="number-cell">${cost}</td><td class="number-cell">${cost}</td><td></td><td></td><td>${accountabilityTimeline.length?"":escapeFormValue(unit.status&&unit.status!=="Available"?unit.status:"")}</td><td class="number-cell">${cost}</td><td></td><td></td></tr>`;
+  const accountabilityRows=accountabilityTimeline.map(entry=>`<tr><td>${escapeFormValue(entry.date)}</td><td>${escapeFormValue(`${entry.label} No.: ${entry.documentNumber}`)}</td><td></td><td></td><td></td><td></td><td></td><td>${escapeFormValue(entry.status)}</td><td></td><td></td><td></td></tr>`).join("");
+  const transactions=receiptRow+accountabilityRows;
+  const blanks=Array.from({length:Math.max(0,18-accountabilityTimeline.length)},()=>`<tr>${Array.from({length:11},()=>"<td>&nbsp;</td>").join("")}</tr>`).join("");
   return `<section class="page-heading no-print"><div><h2>Appendix 70 — PPE Ledger Card</h2><p>Ledger Card for every accepted semi-expendable and capital-outlay unit.</p></div><button class="primary-button" data-print>Print PPE ledger card</button></section>
   <section class="panel stock-card-selector no-print"><label>View PPE ledger${propertySelector(entries,ppeLedgerKey,"ppe-ledger-select")}</label><div><strong>${entries.length}</strong><span>accepted property record${entries.length===1?"":"s"}</span></div></section>
   <article class="property-official-form ppelc-form">

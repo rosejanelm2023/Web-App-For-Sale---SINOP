@@ -70,6 +70,12 @@ test("packages the complete DMW-parity workspace and verified transfer data", as
   assert.match(engine, /renewalDueIsoDate/);
   assert.match(engine, /Same as current receiver/);
   assert.match(engine, /renewal-same-receiver/);
+  assert.match(engine, /propertyAccountabilityTimeline/);
+  assert.match(engine, /status:"Renewed"/);
+  assert.match(engine, /IAR No\.: \$\{unit\.iar\}/);
+  assert.match(engine, /const transactions=receiptRow\+accountabilityRows/);
+  assert.match(engine, /Appendix 63 : Requisition and Issue Slip \(RIS\)/);
+  assert.match(engine, /Appendix 70 : Property, Plant and Equipment Ledger Card \(PPELC\)/);
   assert.match(html, /qrcode\.min\.js/);
   assert.ok(qrLibrary.length > 10000);
   assert.match(hydration, /sinop-dmw-workspace-state-v1/);
