@@ -110,6 +110,10 @@ test("packages the complete DMW-parity workspace and verified transfer data", as
   assert.match(workspaceCss, /Final readable text treatment for navigation tabs and white action cards/);
   assert.match(workspaceCss, /@page sticker-legal\{size:legal portrait/);
   assert.match(workspaceCss, /@page repair-a4\{size:A4 portrait/);
+  assert.match(workspaceCss, /Official print forms must always close with a complete bottom rule/);
+  assert.match(workspaceCss, /property-official-form \.property-form-table tbody tr:last-child>td/);
+  assert.match(workspaceCss, /physical-report-form \.physical-count-table tbody tr:last-child>td/);
+  assert.match(workspaceCss, /disposal-official-form \.disposal-table tbody tr:last-child>td/);
   assert.match(workspaceCss, /font-size:18pt!important/);
   assert.match(workspaceCss, /font-size:10pt!important/);
   assert.match(workspaceCss, /font-size:9pt!important/);

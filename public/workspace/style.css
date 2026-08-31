@@ -94,7 +94,7 @@ main { max-width: 1580px; margin: 0 auto; padding: 27px 31px 38px; }
 table { width: 100%; border-collapse: collapse; font-size: 9px; }
 th { color: #7a8b9d; background: #f8fafb; text-align: left; font-size: 8px; text-transform: uppercase; letter-spacing: .55px; font-weight: 750; }
 th,td { padding: 10px 13px; border-bottom: 1px solid #edf1f4; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: 0; }
+.table-wrap tbody tr:last-child td { border-bottom: 0; }
 tbody tr:hover { background: #fbfcfd; }
 td { color: #4b6075; }
 td strong { color: #31485f; }
@@ -1059,6 +1059,22 @@ img[data-agency-header][hidden]{display:none!important}
   body:has(.qr-label-preview) .qr-modal{width:100%;overflow:visible;border-radius:0;box-shadow:none}
   body:has(.qr-label-preview) .qr-label-preview{width:82mm;max-width:none;margin:0 auto;padding:6mm;border:1.5px solid #000;border-radius:0}
   body:has(.qr-label-preview) .qr-label-preview canvas{width:55mm!important;height:55mm!important}
+}
+
+/* Official print forms must always close with a complete bottom rule. */
+.government-form table,
+.stock-card-print-area .stock-card-table,
+.property-official-form .property-form-table,
+.physical-report-form .physical-count-table,
+.disposal-official-form .disposal-table{
+  border:1px solid currentColor!important;
+}
+.government-form table tbody tr:last-child>td,
+.stock-card-print-area .stock-card-table tbody tr:last-child>td,
+.property-official-form .property-form-table tbody tr:last-child>td,
+.physical-report-form .physical-count-table tbody tr:last-child>td,
+.disposal-official-form .disposal-table tbody tr:last-child>td{
+  border-bottom:1px solid currentColor!important;
 }
 
 /* Custom legal-size inventory sticker builder. */
