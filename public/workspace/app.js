@@ -976,10 +976,22 @@ function inventoryCustodianSlipReport(){
   </article>`;
 }
 
+function latestPropertyRepair(unit){
+  const repairs=(Array.isArray(unit.propertyHistory)?unit.propertyHistory:[])
+    .filter(entry=>entry?.type==="Repair"||entry?.status==="Repair"||entry?.status==="Repaired")
+    .map((entry,index)=>({...entry,index,sortDate:normalizeDatePickerValue(entry.date||"")}))
+    .sort((a,b)=>String(a.sortDate).localeCompare(String(b.sortDate))||a.index-b.index);
+  return repairs.at(-1)||{};
+}
+
 function repairInspectionState(unit){
-  if(unit.repairInspection)return unit.repairInspection;
-  const repairs=Array.isArray(unit.propertyHistory)?unit.propertyHistory.filter(entry=>entry?.type==="Repair"||entry?.status==="Repaired"):[];
-  const lastRepair=repairs.at(-1)||{};
+  const lastRepair=latestPropertyRepair(unit);
+  if(unit.repairInspection){
+    if(!unit.repairInspection.lastRepairDate)unit.repairInspection.lastRepairDate=lastRepair.date||"";
+    if(!unit.repairInspection.lastRepairNature)unit.repairInspection.lastRepairNature=lastRepair.natureRepair||"";
+    unit.repairInspection.payableAmount=unit.repairInspection.jobOrderAmount||unit.repairInspection.payableAmount||"";
+    return unit.repairInspection;
+  }
   unit.repairInspection={
     scope:"",
     parts:"",
@@ -1003,6 +1015,17 @@ function repairInspectionState(unit){
   return unit.repairInspection;
 }
 
+function beginPropertyRepair(unit){
+  const completed=unit.repairInspection;
+  if(completed?.status==="Completed"){
+    const archive=Array.isArray(unit.repairInspectionHistory)?unit.repairInspectionHistory:[];
+    if(!archive.some(entry=>entry.id===completed.id))archive.push({...completed});
+    unit.repairInspectionHistory=archive;
+    unit.repairInspection=null;
+  }
+  return repairInspectionState(unit);
+}
+
 function repairInspectionReport(){
   const entries=acceptedAccountablePropertyUnits();
   if(!entries.length)return propertyEmptyState("REPAIR","Request for Pre-Post Inspection Report","Complete an IAR containing a semi-expendable or capital-outlay item before preparing a repair inspection report.");
@@ -1014,17 +1037,17 @@ function repairInspectionReport(){
   const employeeOptions=selected=>`${selected&&!masters.Employees.some(employee=>employee[1]===selected)?`<option value="${escapeFormValue(selected)}" selected>${escapeFormValue(selected)} (Current record)</option>`:""}${propertyEmployeeOptions(selected)}`;
   const lines=value=>String(value||"").split(/\r?\n/).filter(Boolean);
   const ruledLines=(value,count=3)=>{const values=lines(value);return Array.from({length:Math.max(count,values.length)},(_,index)=>`<span>${escapeFormValue(values[index]||"")}</span>`).join("")};
-  const signature=(label,name,position,date,role)=>`<section><strong>${label}</strong><span class="repair-signature-space"></span><b>${escapeFormValue(name||"____________________________")}</b><em>${escapeFormValue(position||employeePosition(name)||role||"____________________")}</em>${role?`<small>${escapeFormValue(role)}</small>`:""}${date!==undefined?`<p><span>Date:</span><b>${physicalReportDate(date)}</b></p>`:""}</section>`;
+  const signature=(label,name,position,date,role)=>`<section><strong>${label}</strong><span class="repair-signature-space"></span><b>${escapeFormValue(name||"____________________________")}</b><em>${escapeFormValue(position||employeePosition(name)||role||"____________________")}</em>${role&&role!==position?`<small>${escapeFormValue(role)}</small>`:""}${date!==undefined?`<p><span>Date:</span><b>${physicalReportDate(date)}</b></p>`:""}</section>`;
   const field=(label,name,value,type="text",attributes="")=>`<label>${label}<input type="${type}" data-repair-field="${name}" value="${escapeFormValue(value)}" ${attributes}></label>`;
   return `<section class="page-heading no-print"><div><h2>Request for Pre-Post Inspection</h2><p>Prepare, save, complete, and print the repair inspection record for the selected accountable property.</p></div><button class="primary-button" data-print>Print inspection report</button></section>
-  <section class="panel repair-report-controls no-print"><div class="panel-heading"><div><h3>Repair inspection details</h3><p>Property information is copied from the master record. Complete the request, pre-repair, and post-repair fields below.</p></div><span class="class-tag">${escapeFormValue(state.status||"Draft")}</span></div><label class="repair-property-picker">Property${propertySelector(entries,repairPropertyKey,"repair-property-select")}</label><div class="repair-control-section"><h4>Request details</h4><div class="form-grid">${field("Date of last repair","lastRepairDate",state.lastRepairDate,"date")}${field("Nature of last repair","lastRepairNature",state.lastRepairNature)}<label class="wide">Defects / complaints — nature and scope of work<textarea data-repair-field="scope" rows="3">${escapeFormValue(state.scope)}</textarea></label><label class="wide">Parts to be supplied / replaced <small>Enter one part per line</small><textarea data-repair-field="parts" rows="3">${escapeFormValue(state.parts)}</textarea></label><label>Requested by<select data-repair-field="requestedBy"><option value="">Select employee</option>${employeeOptions(state.requestedBy)}</select></label></div></div><div class="repair-control-section"><h4>Pre-repair inspection</h4><div class="form-grid"><label class="wide">Findings<textarea data-repair-field="preFindings" rows="3">${escapeFormValue(state.preFindings)}</textarea></label><label>Pre-inspected by<select data-repair-field="preInspectedBy"><option value="">Select employee</option>${employeeOptions(state.preInspectedBy)}</select></label>${field("Inspection date","preDate",state.preDate,"date")}</div></div><div class="repair-control-section"><h4>Post-repair inspection</h4><div class="form-grid thirds">${field("Job Order No.","jobOrderNumber",state.jobOrderNumber)}${field("Job Order date","jobOrderDate",state.jobOrderDate,"date")}${field("Amount / Job Order","jobOrderAmount",state.jobOrderAmount,"number",'min="0" step="0.01"')}${field("Invoice No.","invoiceNumber",state.invoiceNumber)}${field("Invoice date","invoiceDate",state.invoiceDate,"date")}${field("Payable amount","payableAmount",state.payableAmount,"number",'min="0" step="0.01"')}<label class="wide">Findings<textarea data-repair-field="postFindings" rows="3">${escapeFormValue(state.postFindings)}</textarea></label><label>Inspected by<select data-repair-field="postInspectedBy"><option value="">Select employee</option>${employeeOptions(state.postInspectedBy)}</select></label>${field("Post-inspection date","postDate",state.postDate,"date")}</div></div><div class="repair-control-actions"><button class="secondary-button" type="button" id="save-repair-report">Save repair record</button><button class="primary-button" type="button" id="complete-repair-report">Complete repair</button></div><p class="field-error" id="repair-report-error"></p></section>
+  <section class="panel repair-report-controls no-print"><div class="panel-heading"><div><h3>Repair inspection details</h3><p>Property information is copied from the master record. Complete the request, pre-repair, and post-repair fields below.</p></div><span class="class-tag">${escapeFormValue(state.status||"Draft")}</span></div><label class="repair-property-picker">Property${propertySelector(entries,repairPropertyKey,"repair-property-select")}</label><div class="repair-control-section"><h4>Request details</h4><div class="form-grid">${field("Date of last repair","lastRepairDate",state.lastRepairDate,"date",'readonly aria-readonly="true"')}${field("Nature of last repair","lastRepairNature",state.lastRepairNature,"text",'readonly aria-readonly="true"')}<label class="wide">Defects / complaints — nature and scope of work<textarea data-repair-field="scope" rows="3">${escapeFormValue(state.scope)}</textarea></label><label class="wide">Parts to be supplied / replaced <small>Enter one part per line</small><textarea data-repair-field="parts" rows="3">${escapeFormValue(state.parts)}</textarea></label><label>Requested by<select data-repair-field="requestedBy"><option value="">Select employee</option>${employeeOptions(state.requestedBy)}</select></label></div></div><div class="repair-control-section"><h4>Pre-repair inspection</h4><div class="form-grid"><label class="wide">Findings<textarea data-repair-field="preFindings" rows="3">${escapeFormValue(state.preFindings)}</textarea></label><label>Pre-inspected by<select data-repair-field="preInspectedBy"><option value="">Select employee</option>${employeeOptions(state.preInspectedBy)}</select></label>${field("Inspection date","preDate",state.preDate,"date")}</div></div><div class="repair-control-section"><h4>Post-repair inspection</h4><div class="form-grid thirds">${field("Job Order No.","jobOrderNumber",state.jobOrderNumber)}${field("Job Order date","jobOrderDate",state.jobOrderDate,"date")}${field("Amount / Job Order","jobOrderAmount",state.jobOrderAmount,"number",'min="0" step="0.01"')}${field("Invoice No.","invoiceNumber",state.invoiceNumber)}${field("Invoice date","invoiceDate",state.invoiceDate,"date")}${field("Payable amount","payableAmount",state.jobOrderAmount,"number",'readonly aria-readonly="true"')}<label class="wide">Findings<textarea data-repair-field="postFindings" rows="3">${escapeFormValue(state.postFindings)}</textarea></label><label>Inspected by<select data-repair-field="postInspectedBy"><option value="">Select employee</option>${employeeOptions(state.postInspectedBy)}</select></label>${field("Post-inspection date","postDate",state.postDate,"date")}</div></div><div class="repair-control-actions"><button class="secondary-button" type="button" id="save-repair-report">Save repair record</button><button class="primary-button" type="button" id="complete-repair-report">Complete repair</button></div><p class="field-error" id="repair-report-error"></p></section>
   <article class="property-official-form repair-inspection-form">
     <img class="property-form-header repair-inspection-header" src="/agency-header-placeholder.png" alt="Your Agency official header"><h1>REQUEST FOR PRE- POST INSPECTION</h1>
     <section class="repair-form-section repair-description-section"><h2><b>I</b><span>DESCRIPTION OF PROPERTY:</span></h2><div class="repair-description-grid"><div><p><b>TYPE</b><span>${escapeFormValue(unit.item||unit.description||"")}</span></p><p><b>SERIAL / PLATE NO.</b><span>${escapeFormValue(unit.serial||"N/A")}</span></p><p><b>ACQUISITION COST:</b><span>₱${money(unit.cost)}</span></p><p><b>DATE OF LAST REPAIR:</b><span>${state.lastRepairDate?physicalReportDate(state.lastRepairDate):"N/A"}</span></p></div><div><p><b>BRAND/MODEL:</b><span>${escapeFormValue([unit.brand,unit.model].filter(Boolean).join(", ")||"N/A")}</span></p><p><b>PROPERTY NO:</b><span>${escapeFormValue(unit.number||unit.inventoryNumber||"N/A")}</span></p><p><b>ACQUISITION COST:</b><span>₱${money(unit.cost)}</span></p><p><b>NATURE OF LAST REPAIR:</b><span>${escapeFormValue(state.lastRepairNature||"N/A")}</span></p></div></div></section>
     <section class="repair-form-section"><h2><b>II</b><span>DEFFECTS/ COMPLAINTS</span></h2><h3>NATURE AND SCOPE OF WORK TO BE DONE</h3><div class="repair-ruled-lines">${ruledLines(state.scope,3)}</div></section>
     <section class="repair-form-section repair-parts-section"><h2><b>III</b><span>PARTS TO BE SUPPLIED/ REPLACED</span></h2><div class="repair-parts-layout"><div class="repair-ruled-lines">${ruledLines(state.parts,3)}</div>${signature("Requested by:",state.requestedBy,employeePosition(state.requestedBy),undefined,"END USER")}</div></section>
     <section class="repair-form-section repair-pre-section"><h2><b>I</b><span>PRE- REPAIR</span></h2><h3>FINDINGS:</h3><div class="repair-ruled-lines findings">${ruledLines(state.preFindings,3)}</div>${signature("Pre- Inspected by:",state.preInspectedBy,"Inspection Officer",state.preDate,"Inspection Officer")}</section>
-    <section class="repair-form-section repair-post-section"><h2><b>II</b><span>POST- REPAIR</span></h2><div class="repair-post-meta"><div><p><b>JOB ORDER NO:</b><span>${escapeFormValue(state.jobOrderNumber)}</span></p><p><b>INVOICE NO.</b><span>${escapeFormValue(state.invoiceNumber)}</span></p><p><b>AMOUNT/ JOB ORDER:</b><span>${state.jobOrderAmount?`₱${money(state.jobOrderAmount)}`:""}</span></p></div><div><p><b>DATE:</b><span>${physicalReportDate(state.jobOrderDate)}</span></p><p><b>DATE:</b><span>${physicalReportDate(state.invoiceDate)}</span></p><p><b>PAYABLE AMOUNT:</b><span>${state.payableAmount?`₱${money(state.payableAmount)}`:""}</span></p></div></div><h3>FINDINGS:</h3><div class="repair-ruled-lines findings">${ruledLines(state.postFindings,3)}</div>${signature("Inspected by:",state.postInspectedBy,"Inspection Officer",state.postDate,"Inspection Officer")}</section>
+    <section class="repair-form-section repair-post-section"><h2><b>II</b><span>POST- REPAIR</span></h2><div class="repair-post-meta"><div><p><b>JOB ORDER NO:</b><span>${escapeFormValue(state.jobOrderNumber)}</span></p><p><b>INVOICE NO.</b><span>${escapeFormValue(state.invoiceNumber)}</span></p><p><b>AMOUNT/ JOB ORDER:</b><span>${state.jobOrderAmount?`₱${money(state.jobOrderAmount)}`:""}</span></p></div><div><p><b>DATE:</b><span>${physicalReportDate(state.jobOrderDate)}</span></p><p><b>DATE:</b><span>${physicalReportDate(state.invoiceDate)}</span></p><p><b>PAYABLE AMOUNT:</b><span>${state.jobOrderAmount?`₱${money(state.jobOrderAmount)}`:""}</span></p></div></div><h3>FINDINGS:</h3><div class="repair-ruled-lines findings">${ruledLines(state.postFindings,3)}</div>${signature("Inspected by:",state.postInspectedBy,"Inspection Officer",state.postDate,"Inspection Officer")}</section>
   </article>`;
 }
 
@@ -1345,7 +1368,7 @@ function bindEnhanced(){
   });
   document.querySelectorAll("[data-edit-property]").forEach(b=>b.onclick=()=>openPropertyForm(+b.dataset.editProperty));
   document.querySelectorAll("[data-generate-property-qr]").forEach(b=>b.onclick=()=>openPropertyQr(+b.dataset.generatePropertyQr));
-  document.querySelectorAll("[data-repair-property]").forEach(b=>b.onclick=()=>{const entry=propertyUnits[+b.dataset.repairProperty];repairPropertyKey=String(entry.dbId||b.dataset.repairProperty);formTab="Pre/Post Inspection";render("Forms")});
+  document.querySelectorAll("[data-repair-property]").forEach(b=>b.onclick=()=>{const entry=propertyUnits[+b.dataset.repairProperty];beginPropertyRepair(entry);repairPropertyKey=String(entry.dbId||b.dataset.repairProperty);formTab="Pre/Post Inspection";render("Forms")});
   document.querySelectorAll("[data-view-ics]").forEach(b=>b.onclick=()=>{const entry=propertyUnits[+b.dataset.viewIcs];icsPropertyKey=String(entry.dbId||b.dataset.viewIcs);formTab="Appendix 59 (ICS)";render("Forms")});
   document.querySelectorAll("[data-view-par]").forEach(b=>b.onclick=()=>{const entry=propertyUnits[+b.dataset.viewPar];parPropertyKey=String(entry.dbId||b.dataset.viewPar);formTab="Appendix 71 (PAR)";render("Forms")});
   document.querySelectorAll("[data-transfer-property]").forEach(b=>b.onclick=()=>transferProperty(+b.dataset.transferProperty));
@@ -1443,14 +1466,15 @@ function bindEnhanced(){
   const activeRepairEntry=acceptedAccountablePropertyUnits().find(entry=>entry.key===repairPropertyKey);
   if(activeRepairEntry){
     const repairState=repairInspectionState(activeRepairEntry.unit);
-    document.querySelectorAll("[data-repair-field]").forEach(control=>control.addEventListener("change",event=>{repairState[event.target.dataset.repairField]=event.target.value;rerenderReportSurface()}));
+    document.querySelectorAll("[data-repair-field]").forEach(control=>control.addEventListener("change",event=>{const field=event.target.dataset.repairField;repairState[field]=event.target.value;if(field==="jobOrderAmount")repairState.payableAmount=event.target.value;rerenderReportSurface()}));
     document.querySelector("#save-repair-report")?.addEventListener("click",()=>{repairState.status="Pre-Repair";repairState.savedAt=localISODate();activeRepairEntry.unit.status="Under Repair";activeRepairEntry.unit.condition="Repair";showToast("Pre-repair inspection saved. The property is now marked Under Repair.");rerenderReportSurface()});
     document.querySelector("#complete-repair-report")?.addEventListener("click",()=>{
       const error=document.querySelector("#repair-report-error");
       if(!repairState.postFindings||!repairState.postInspectedBy||!repairState.postDate){if(error)error.textContent="Post-repair findings, inspector, and inspection date are required before completion.";return}
       repairState.status="Completed";repairState.completedAt=localISODate();repairState.id=repairState.id||`repair-${Date.now()}`;
       const history=Array.isArray(activeRepairEntry.unit.propertyHistory)?activeRepairEntry.unit.propertyHistory:[];
-      const repairRecord={id:repairState.id,type:"Repair",status:"Repair",date:repairState.postDate,reference:repairState.jobOrderNumber?`Job Order No.: ${repairState.jobOrderNumber}`:repairState.invoiceNumber?`Invoice No.: ${repairState.invoiceNumber}`:"Repair",natureRepair:repairState.scope||repairState.postFindings,repairAmount:Number(repairState.payableAmount||repairState.jobOrderAmount||0),receiver:activeRepairEntry.unit.employee||""};
+      repairState.payableAmount=repairState.jobOrderAmount||"";
+      const repairRecord={id:repairState.id,type:"Repair",status:"Repair",date:repairState.postDate,reference:repairState.jobOrderNumber?`Job Order No.: ${repairState.jobOrderNumber}`:repairState.invoiceNumber?`Invoice No.: ${repairState.invoiceNumber}`:"Repair",natureRepair:repairState.scope||repairState.postFindings,repairAmount:Number(repairState.jobOrderAmount||0),receiver:activeRepairEntry.unit.employee||""};
       const existing=history.findIndex(item=>item.id===repairState.id);if(existing>=0)history[existing]=repairRecord;else history.push(repairRecord);activeRepairEntry.unit.propertyHistory=history;
       activeRepairEntry.unit.status="Issued";activeRepairEntry.unit.condition="Serviceable";repairState.lastRepairDate=repairState.postDate;repairState.lastRepairNature=repairState.scope||repairState.postFindings;
       showToast("Repair completed. The property record and ledger history were updated.");rerenderReportSurface();

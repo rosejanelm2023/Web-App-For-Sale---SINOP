@@ -80,6 +80,10 @@ test("packages the complete DMW-parity workspace and verified transfer data", as
   assert.match(engine, /REQUEST FOR PRE- POST INSPECTION/);
   assert.match(engine, /DEFFECTS\/ COMPLAINTS/);
   assert.match(engine, /Pre- Inspected by:/);
+  assert.match(engine, /role&&role!==position/);
+  assert.match(engine, /readonly aria-readonly="true"/);
+  assert.match(engine, /field==="jobOrderAmount"/);
+  assert.match(engine, /repairInspectionHistory/);
   assert.match(engine, /complete-repair-report/);
   assert.match(engine, /propertyHistory/);
   assert.match(html, /qrcode\.min\.js/);
