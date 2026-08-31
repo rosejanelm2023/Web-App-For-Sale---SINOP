@@ -68,6 +68,8 @@ test("packages the complete DMW-parity workspace and verified transfer data", as
   assert.match(engine, /test-renewal-property-001/);
   assert.match(engine, /data-renew-property/);
   assert.match(engine, /renewalDueIsoDate/);
+  assert.match(engine, /Same as current receiver/);
+  assert.match(engine, /renewal-same-receiver/);
   assert.match(html, /qrcode\.min\.js/);
   assert.ok(qrLibrary.length > 10000);
   assert.match(hydration, /sinop-dmw-workspace-state-v1/);
