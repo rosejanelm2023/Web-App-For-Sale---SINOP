@@ -76,6 +76,12 @@ test("packages the complete DMW-parity workspace and verified transfer data", as
   assert.match(engine, /const transactions=receiptRow\+accountabilityRows/);
   assert.match(engine, /Appendix 63 : Requisition and Issue Slip \(RIS\)/);
   assert.match(engine, /Appendix 70 : Property, Plant and Equipment Ledger Card \(PPELC\)/);
+  assert.match(engine, /data-repair-property/);
+  assert.match(engine, /REQUEST FOR PRE- POST INSPECTION/);
+  assert.match(engine, /DEFFECTS\/ COMPLAINTS/);
+  assert.match(engine, /Pre- Inspected by:/);
+  assert.match(engine, /complete-repair-report/);
+  assert.match(engine, /propertyHistory/);
   assert.match(html, /qrcode\.min\.js/);
   assert.ok(qrLibrary.length > 10000);
   assert.match(hydration, /sinop-dmw-workspace-state-v1/);
@@ -93,6 +99,7 @@ test("packages the complete DMW-parity workspace and verified transfer data", as
   assert.match(workspaceCss, /Final contrast guard for searchable inventory tables and form controls/);
   assert.match(workspaceCss, /Final readable text treatment for navigation tabs and white action cards/);
   assert.match(workspaceCss, /@page sticker-legal\{size:legal portrait/);
+  assert.match(workspaceCss, /@page repair-a4\{size:A4 portrait/);
   assert.match(workspaceCss, /font-size:18pt!important/);
   assert.match(workspaceCss, /font-size:10pt!important/);
   assert.match(workspaceCss, /font-size:9pt!important/);

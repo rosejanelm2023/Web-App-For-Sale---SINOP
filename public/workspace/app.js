@@ -46,6 +46,7 @@ let propertyCardKey="";
 let ppeLedgerKey="";
 let icsPropertyKey="";
 let parPropertyKey="";
+let repairPropertyKey="";
 let ptrSelectedKeys=[];
 let ptrState={number:"",date:localISODate(),from:"",to:"",type:"Reassignment",otherType:"",reason:"",approved:"",released:"",received:""};
 const disposalFormStates={
@@ -165,13 +166,14 @@ function reportsView(){
  return enhancedReports();
 }
 
-const formOptions=["RIS","RSMI","Appendix 57 (SLC)","Appendix 58 (SC)","Appendix 59 (ICS)","Appendix 65 (WMR)","Appendix 69 (PC)","Appendix 70 (PPELC)","Appendix 71 (PAR)","Appendix 74 (IIRUP)","Appendix 75 (RLSDDP)","Appendix 76 (PTR)","Semi-Expendable","Capital Outlay","Inventory Balance"];
+const formOptions=["RIS","RSMI","Appendix 57 (SLC)","Appendix 58 (SC)","Appendix 59 (ICS)","Pre/Post Inspection","Appendix 65 (WMR)","Appendix 69 (PC)","Appendix 70 (PPELC)","Appendix 71 (PAR)","Appendix 74 (IIRUP)","Appendix 75 (RLSDDP)","Appendix 76 (PTR)","Semi-Expendable","Capital Outlay","Inventory Balance"];
 const formOptionLabels={
   RIS:"Appendix 63 : Requisition and Issue Slip (RIS)",
   RSMI:"Appendix 64 : Report of Supplies and Materials Issued (RSMI)",
   "Appendix 57 (SLC)":"Appendix 57 : Supplies Ledger Card (SLC)",
   "Appendix 58 (SC)":"Appendix 58 : Stock Card (SC)",
   "Appendix 59 (ICS)":"Appendix 59 : Inventory Custodian Slip (ICS)",
+  "Pre/Post Inspection":"Request for Pre-Post Inspection Report (Pre/Post)",
   "Appendix 65 (WMR)":"Appendix 65 : Waste Materials Report (WMR)",
   "Appendix 69 (PC)":"Appendix 69 : Property Card (PC)",
   "Appendix 70 (PPELC)":"Appendix 70 : Property, Plant and Equipment Ledger Card (PPELC)",
@@ -572,7 +574,7 @@ function renderInventoryStickerQrCodes(){document.querySelectorAll("[data-sticke
 
 function propertyTable(rows,total=rows.length){
   if(!rows.length)return `<div class="empty-state"><span>PR</span><h3>No property units match</h3><p>Change the search or filters to see more individual units.</p></div>`;
-  return `<div class="table-wrap property-table-wrap"><table class="data-table"><thead><tr><th>Property / Inventory No.</th><th>Item</th><th>Brand</th><th>Model</th><th>Serial No.</th><th>PPE No.</th><th>Acquisition</th><th>Issued to</th><th>Condition</th><th>Actions</th></tr></thead><tbody>${rows.map(p=>{const i=propertyUnits.indexOf(p);const semi=p.classification==="Semi-Expendable";const identifier=semi?p.inventoryNumber:p.number;return `<tr><td>${identifier?`<strong class="linkish">${escapeFormValue(identifier)}</strong>`:`<span class="missing-value">${semi?"Pending inventory no.":"Pending property no."}</span>`}</td><td><strong>${escapeFormValue(p.item||"—")}</strong></td><td>${escapeFormValue(p.brand||"—")}</td><td>${escapeFormValue(p.model||"—")}</td><td>${escapeFormValue(p.serial||"Not entered")}</td><td>${p.number?`<strong>${escapeFormValue(p.number)}</strong>`:`<span class="missing-value">Pending PPE no.</span>`}</td><td><strong>${peso.format(p.cost)}</strong><small>${escapeFormValue(p.date)}</small></td><td>${escapeFormValue(p.employee||"Unassigned")}<small>${escapeFormValue(p.position||p.office||"—")}</small></td><td>${escapeFormValue(p.condition||"—")}</td><td class="property-actions-cell"><div class="property-actions-menu"><button class="property-actions-trigger" data-property-menu="${i}" aria-label="Open property actions" aria-expanded="false">⋮</button><div class="property-actions-popover" data-property-menu-panel="${i}" hidden><button data-generate-property-qr="${i}">Generate QR</button><button data-edit-property="${i}">${semi?"Edit ICS":"Edit property unit"}</button>${semi?`<button data-view-ics="${i}" ${p.icsNumber?"":`disabled title="No generated ICS is available for this record"`}>View ICS</button>`:`<button data-view-par="${i}">View PAR</button>`}<button data-transfer-property="${i}">Transfer</button><button data-unserviceable-property="${i}" ${p.status==="Unserviceable"?"disabled":""}>Unserviceable</button></div></div></td></tr>`}).join("")}</tbody></table></div><div class="pagination"><span>Showing ${rows.length?`1–${rows.length}`:"0"} of ${total} property units</span><div><button disabled>‹</button><button class="active">1</button><button>›</button></div></div>`;
+  return `<div class="table-wrap property-table-wrap"><table class="data-table"><thead><tr><th>Property / Inventory No.</th><th>Item</th><th>Brand</th><th>Model</th><th>Serial No.</th><th>PPE No.</th><th>Acquisition</th><th>Issued to</th><th>Condition</th><th>Actions</th></tr></thead><tbody>${rows.map(p=>{const i=propertyUnits.indexOf(p);const semi=p.classification==="Semi-Expendable";const identifier=semi?p.inventoryNumber:p.number;return `<tr><td>${identifier?`<strong class="linkish">${escapeFormValue(identifier)}</strong>`:`<span class="missing-value">${semi?"Pending inventory no.":"Pending property no."}</span>`}</td><td><strong>${escapeFormValue(p.item||"—")}</strong></td><td>${escapeFormValue(p.brand||"—")}</td><td>${escapeFormValue(p.model||"—")}</td><td>${escapeFormValue(p.serial||"Not entered")}</td><td>${p.number?`<strong>${escapeFormValue(p.number)}</strong>`:`<span class="missing-value">Pending PPE no.</span>`}</td><td><strong>${peso.format(p.cost)}</strong><small>${escapeFormValue(p.date)}</small></td><td>${escapeFormValue(p.employee||"Unassigned")}<small>${escapeFormValue(p.position||p.office||"—")}</small></td><td>${escapeFormValue(p.condition||"—")}</td><td class="property-actions-cell"><div class="property-actions-menu"><button class="property-actions-trigger" data-property-menu="${i}" aria-label="Open property actions" aria-expanded="false">⋮</button><div class="property-actions-popover" data-property-menu-panel="${i}" hidden><button data-generate-property-qr="${i}">Generate QR</button><button data-edit-property="${i}">${semi?"Edit ICS":"Edit property unit"}</button>${semi?`<button data-view-ics="${i}" ${p.icsNumber?"":`disabled title="No generated ICS is available for this record"`}>View ICS</button>`:`<button data-view-par="${i}">View PAR</button>`}<button data-repair-property="${i}">Repair</button><button data-transfer-property="${i}">Transfer</button><button data-unserviceable-property="${i}" ${p.status==="Unserviceable"?"disabled":""}>Unserviceable</button></div></div></td></tr>`}).join("")}</tbody></table></div><div class="pagination"><span>Showing ${rows.length?`1–${rows.length}`:"0"} of ${total} property units</span><div><button disabled>‹</button><button class="active">1</button><button>›</button></div></div>`;
 }
 
 function propertyQrPayload(property,index){
@@ -789,6 +791,7 @@ function reportContent(selectedTab=reportTab){
   if(selectedTab==="Appendix 57 (SLC)")return suppliesLedgerReport();
   if(selectedTab==="Appendix 58 (SC)")return stockCardReport();
   if(selectedTab==="Appendix 59 (ICS)")return inventoryCustodianSlipReport();
+  if(selectedTab==="Pre/Post Inspection")return repairInspectionReport();
   if(selectedTab==="Appendix 65 (WMR)")return wasteMaterialsReport();
   if(selectedTab==="Appendix 66 (RCPI)")return rcpiReport();
   if(selectedTab==="Appendix 69 (PC)")return propertyCardReport();
@@ -973,6 +976,58 @@ function inventoryCustodianSlipReport(){
   </article>`;
 }
 
+function repairInspectionState(unit){
+  if(unit.repairInspection)return unit.repairInspection;
+  const repairs=Array.isArray(unit.propertyHistory)?unit.propertyHistory.filter(entry=>entry?.type==="Repair"||entry?.status==="Repaired"):[];
+  const lastRepair=repairs.at(-1)||{};
+  unit.repairInspection={
+    scope:"",
+    parts:"",
+    requestedBy:unit.employee||"",
+    preFindings:"",
+    preInspectedBy:"",
+    preDate:"",
+    lastRepairDate:lastRepair.date||"",
+    lastRepairNature:lastRepair.natureRepair||"",
+    jobOrderNumber:"",
+    jobOrderDate:"",
+    invoiceNumber:"",
+    invoiceDate:"",
+    jobOrderAmount:"",
+    payableAmount:"",
+    postFindings:"",
+    postInspectedBy:"",
+    postDate:"",
+    status:"Draft"
+  };
+  return unit.repairInspection;
+}
+
+function repairInspectionReport(){
+  const entries=acceptedAccountablePropertyUnits();
+  if(!entries.length)return propertyEmptyState("REPAIR","Request for Pre-Post Inspection Report","Complete an IAR containing a semi-expendable or capital-outlay item before preparing a repair inspection report.");
+  if(!entries.some(entry=>entry.key===repairPropertyKey))repairPropertyKey=entries[0].key;
+  const entry=entries.find(value=>value.key===repairPropertyKey);
+  const unit=entry.unit;
+  const state=repairInspectionState(unit);
+  const money=value=>Number(value||0).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2});
+  const employeeOptions=selected=>`${selected&&!masters.Employees.some(employee=>employee[1]===selected)?`<option value="${escapeFormValue(selected)}" selected>${escapeFormValue(selected)} (Current record)</option>`:""}${propertyEmployeeOptions(selected)}`;
+  const lines=value=>String(value||"").split(/\r?\n/).filter(Boolean);
+  const ruledLines=(value,count=3)=>{const values=lines(value);return Array.from({length:Math.max(count,values.length)},(_,index)=>`<span>${escapeFormValue(values[index]||"")}</span>`).join("")};
+  const signature=(label,name,position,date,role)=>`<section><strong>${label}</strong><span class="repair-signature-space"></span><b>${escapeFormValue(name||"____________________________")}</b><em>${escapeFormValue(position||employeePosition(name)||role||"____________________")}</em>${role?`<small>${escapeFormValue(role)}</small>`:""}${date!==undefined?`<p><span>Date:</span><b>${physicalReportDate(date)}</b></p>`:""}</section>`;
+  const field=(label,name,value,type="text",attributes="")=>`<label>${label}<input type="${type}" data-repair-field="${name}" value="${escapeFormValue(value)}" ${attributes}></label>`;
+  return `<section class="page-heading no-print"><div><h2>Request for Pre-Post Inspection</h2><p>Prepare, save, complete, and print the repair inspection record for the selected accountable property.</p></div><button class="primary-button" data-print>Print inspection report</button></section>
+  <section class="panel repair-report-controls no-print"><div class="panel-heading"><div><h3>Repair inspection details</h3><p>Property information is copied from the master record. Complete the request, pre-repair, and post-repair fields below.</p></div><span class="class-tag">${escapeFormValue(state.status||"Draft")}</span></div><label class="repair-property-picker">Property${propertySelector(entries,repairPropertyKey,"repair-property-select")}</label><div class="repair-control-section"><h4>Request details</h4><div class="form-grid">${field("Date of last repair","lastRepairDate",state.lastRepairDate,"date")}${field("Nature of last repair","lastRepairNature",state.lastRepairNature)}<label class="wide">Defects / complaints — nature and scope of work<textarea data-repair-field="scope" rows="3">${escapeFormValue(state.scope)}</textarea></label><label class="wide">Parts to be supplied / replaced <small>Enter one part per line</small><textarea data-repair-field="parts" rows="3">${escapeFormValue(state.parts)}</textarea></label><label>Requested by<select data-repair-field="requestedBy"><option value="">Select employee</option>${employeeOptions(state.requestedBy)}</select></label></div></div><div class="repair-control-section"><h4>Pre-repair inspection</h4><div class="form-grid"><label class="wide">Findings<textarea data-repair-field="preFindings" rows="3">${escapeFormValue(state.preFindings)}</textarea></label><label>Pre-inspected by<select data-repair-field="preInspectedBy"><option value="">Select employee</option>${employeeOptions(state.preInspectedBy)}</select></label>${field("Inspection date","preDate",state.preDate,"date")}</div></div><div class="repair-control-section"><h4>Post-repair inspection</h4><div class="form-grid thirds">${field("Job Order No.","jobOrderNumber",state.jobOrderNumber)}${field("Job Order date","jobOrderDate",state.jobOrderDate,"date")}${field("Amount / Job Order","jobOrderAmount",state.jobOrderAmount,"number",'min="0" step="0.01"')}${field("Invoice No.","invoiceNumber",state.invoiceNumber)}${field("Invoice date","invoiceDate",state.invoiceDate,"date")}${field("Payable amount","payableAmount",state.payableAmount,"number",'min="0" step="0.01"')}<label class="wide">Findings<textarea data-repair-field="postFindings" rows="3">${escapeFormValue(state.postFindings)}</textarea></label><label>Inspected by<select data-repair-field="postInspectedBy"><option value="">Select employee</option>${employeeOptions(state.postInspectedBy)}</select></label>${field("Post-inspection date","postDate",state.postDate,"date")}</div></div><div class="repair-control-actions"><button class="secondary-button" type="button" id="save-repair-report">Save repair record</button><button class="primary-button" type="button" id="complete-repair-report">Complete repair</button></div><p class="field-error" id="repair-report-error"></p></section>
+  <article class="property-official-form repair-inspection-form">
+    <img class="property-form-header repair-inspection-header" src="/agency-header-placeholder.png" alt="Your Agency official header"><h1>REQUEST FOR PRE- POST INSPECTION</h1>
+    <section class="repair-form-section repair-description-section"><h2><b>I</b><span>DESCRIPTION OF PROPERTY:</span></h2><div class="repair-description-grid"><div><p><b>TYPE</b><span>${escapeFormValue(unit.item||unit.description||"")}</span></p><p><b>SERIAL / PLATE NO.</b><span>${escapeFormValue(unit.serial||"N/A")}</span></p><p><b>ACQUISITION COST:</b><span>₱${money(unit.cost)}</span></p><p><b>DATE OF LAST REPAIR:</b><span>${state.lastRepairDate?physicalReportDate(state.lastRepairDate):"N/A"}</span></p></div><div><p><b>BRAND/MODEL:</b><span>${escapeFormValue([unit.brand,unit.model].filter(Boolean).join(", ")||"N/A")}</span></p><p><b>PROPERTY NO:</b><span>${escapeFormValue(unit.number||unit.inventoryNumber||"N/A")}</span></p><p><b>ACQUISITION COST:</b><span>₱${money(unit.cost)}</span></p><p><b>NATURE OF LAST REPAIR:</b><span>${escapeFormValue(state.lastRepairNature||"N/A")}</span></p></div></div></section>
+    <section class="repair-form-section"><h2><b>II</b><span>DEFFECTS/ COMPLAINTS</span></h2><h3>NATURE AND SCOPE OF WORK TO BE DONE</h3><div class="repair-ruled-lines">${ruledLines(state.scope,3)}</div></section>
+    <section class="repair-form-section repair-parts-section"><h2><b>III</b><span>PARTS TO BE SUPPLIED/ REPLACED</span></h2><div class="repair-parts-layout"><div class="repair-ruled-lines">${ruledLines(state.parts,3)}</div>${signature("Requested by:",state.requestedBy,employeePosition(state.requestedBy),undefined,"END USER")}</div></section>
+    <section class="repair-form-section repair-pre-section"><h2><b>I</b><span>PRE- REPAIR</span></h2><h3>FINDINGS:</h3><div class="repair-ruled-lines findings">${ruledLines(state.preFindings,3)}</div>${signature("Pre- Inspected by:",state.preInspectedBy,"Inspection Officer",state.preDate,"Inspection Officer")}</section>
+    <section class="repair-form-section repair-post-section"><h2><b>II</b><span>POST- REPAIR</span></h2><div class="repair-post-meta"><div><p><b>JOB ORDER NO:</b><span>${escapeFormValue(state.jobOrderNumber)}</span></p><p><b>INVOICE NO.</b><span>${escapeFormValue(state.invoiceNumber)}</span></p><p><b>AMOUNT/ JOB ORDER:</b><span>${state.jobOrderAmount?`₱${money(state.jobOrderAmount)}`:""}</span></p></div><div><p><b>DATE:</b><span>${physicalReportDate(state.jobOrderDate)}</span></p><p><b>DATE:</b><span>${physicalReportDate(state.invoiceDate)}</span></p><p><b>PAYABLE AMOUNT:</b><span>${state.payableAmount?`₱${money(state.payableAmount)}`:""}</span></p></div></div><h3>FINDINGS:</h3><div class="repair-ruled-lines findings">${ruledLines(state.postFindings,3)}</div>${signature("Inspected by:",state.postInspectedBy,"Inspection Officer",state.postDate,"Inspection Officer")}</section>
+  </article>`;
+}
+
 function propertyCardReport(){
   const entries=acceptedAccountablePropertyUnits();
   if(!entries.length)return propertyEmptyState("PC","Appendix 69 Property Card");
@@ -982,7 +1037,7 @@ function propertyCardReport(){
   const accountabilityTimeline=propertyAccountabilityTimeline(unit);
   const iarReference=unit.iar?`IAR No.: ${unit.iar}`:unit.po?`PO No.: ${unit.po}`:"";
   const receiptRow=`<tr><td>${escapeFormValue(unit.date)}</td><td>${escapeFormValue(iarReference)}</td><td class="number-cell">1</td><td></td><td></td><td class="number-cell">1</td><td class="number-cell">${amount}</td><td>Received</td></tr>`;
-  const accountabilityRows=accountabilityTimeline.map(entry=>`<tr><td>${escapeFormValue(entry.date)}</td><td>${escapeFormValue(`${entry.label} No.: ${entry.documentNumber}`)}</td><td></td><td class="number-cell">${entry.status==="Issued"?"1":""}</td><td>${escapeFormValue(entry.receiver||unit.office)}</td><td class="number-cell">1</td><td></td><td>${escapeFormValue(entry.status)}</td></tr>`).join("");
+  const accountabilityRows=accountabilityTimeline.map(entry=>`<tr><td>${escapeFormValue(entry.date)}</td><td>${escapeFormValue(entry.reference||`${entry.label} No.: ${entry.documentNumber}`)}</td><td></td><td class="number-cell">${entry.status==="Issued"?"1":""}</td><td>${escapeFormValue(entry.receiver||unit.office)}</td><td class="number-cell">1</td><td></td><td>${escapeFormValue(entry.status)}</td></tr>`).join("");
   const blanks=Array.from({length:Math.max(0,17-accountabilityTimeline.length)},()=>`<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`).join("");
   return `<section class="page-heading no-print"><div><h2>Appendix 69 — Property Card</h2><p>Property Card for every accepted semi-expendable and capital-outlay unit.</p></div><button class="primary-button" data-print>Print property card</button></section>
   <section class="panel stock-card-selector no-print"><label>View property card${propertySelector(entries,propertyCardKey,"property-card-select")}</label><div><strong>${entries.length}</strong><span>accepted property record${entries.length===1?"":"s"}</span></div></section>
@@ -1000,10 +1055,10 @@ function propertyAccountabilityTimeline(unit){
   const currentDocument=String(semi?unit.icsNumber||"":unit.parNumber||"");
   if(!currentDocument)return [];
   const history=Array.isArray(unit.renewalHistory)?unit.renewalHistory.filter(entry=>entry&&entry.documentNumber):[];
-  if(!history.length)return [{date:unit.issuedDate||unit.date||"",documentNumber:currentDocument,receiver:unit.employee||unit.office||"",status:"Issued",label}];
-  const timeline=[{date:unit.issuedDate||unit.date||"",documentNumber:String(history[0].documentNumber),receiver:history[0].receiver||unit.office||"",status:"Issued",label}];
-  history.forEach((renewal,index)=>{const next=history[index+1];const renewalDate=renewal.date||unit.issuedDate||unit.date||"";timeline.push({date:/^\d{4}-\d{2}-\d{2}$/.test(renewalDate)?renewalDateLabel(renewalDate):renewalDate,documentNumber:String(next?.documentNumber||currentDocument),receiver:next?.receiver||unit.employee||unit.office||"",status:"Renewed",label})});
-  return timeline;
+  const timeline=[{date:unit.issuedDate||unit.date||"",documentNumber:String(history[0]?.documentNumber||currentDocument),receiver:history[0]?.receiver||unit.employee||unit.office||"",status:"Issued",label,sortDate:normalizeDatePickerValue(unit.issuedDate||unit.isoDate||"")}];
+  history.forEach((renewal,index)=>{const next=history[index+1];const renewalDate=renewal.date||unit.issuedDate||unit.date||"";timeline.push({date:/^\d{4}-\d{2}-\d{2}$/.test(renewalDate)?renewalDateLabel(renewalDate):renewalDate,documentNumber:String(next?.documentNumber||currentDocument),receiver:next?.receiver||unit.employee||unit.office||"",status:"Renewed",label,sortDate:normalizeDatePickerValue(renewalDate)})});
+  const propertyUpdates=(Array.isArray(unit.propertyHistory)?unit.propertyHistory:[]).map(update=>{const updateDate=update.date||unit.date||"";return {date:/^\d{4}-\d{2}-\d{2}$/.test(updateDate)?renewalDateLabel(updateDate):updateDate,reference:update.reference||update.type||"Property update",receiver:update.receiver||unit.employee||unit.office||"",status:update.status||update.type||"Updated",natureRepair:update.natureRepair||"",repairAmount:Number(update.repairAmount||0),sortDate:normalizeDatePickerValue(updateDate)}});
+  return [timeline[0],...[...timeline.slice(1),...propertyUpdates].sort((a,b)=>String(a.sortDate||"").localeCompare(String(b.sortDate||"")))];
 }
 
 function ppeLedgerReport(){
@@ -1015,7 +1070,7 @@ function ppeLedgerReport(){
   const reference=unit.iar?`IAR No.: ${unit.iar}`:unit.po?`PO No.: ${unit.po}`:"";
   const accountabilityTimeline=propertyAccountabilityTimeline(unit);
   const receiptRow=`<tr><td>${escapeFormValue(unit.date)}</td><td>${escapeFormValue(reference)}</td><td class="number-cell">1</td><td class="number-cell">${cost}</td><td class="number-cell">${cost}</td><td></td><td></td><td>${accountabilityTimeline.length?"":escapeFormValue(unit.status&&unit.status!=="Available"?unit.status:"")}</td><td class="number-cell">${cost}</td><td></td><td></td></tr>`;
-  const accountabilityRows=accountabilityTimeline.map(entry=>`<tr><td>${escapeFormValue(entry.date)}</td><td>${escapeFormValue(`${entry.label} No.: ${entry.documentNumber}`)}</td><td></td><td></td><td></td><td></td><td></td><td>${escapeFormValue(entry.status)}</td><td></td><td></td><td></td></tr>`).join("");
+  const accountabilityRows=accountabilityTimeline.map(entry=>`<tr><td>${escapeFormValue(entry.date)}</td><td>${escapeFormValue(entry.reference||`${entry.label} No.: ${entry.documentNumber}`)}</td><td></td><td></td><td></td><td></td><td></td><td>${escapeFormValue(entry.status)}</td><td></td><td>${escapeFormValue(entry.natureRepair||"")}</td><td class="number-cell">${entry.repairAmount?Number(entry.repairAmount).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2}):""}</td></tr>`).join("");
   const transactions=receiptRow+accountabilityRows;
   const blanks=Array.from({length:Math.max(0,18-accountabilityTimeline.length)},()=>`<tr>${Array.from({length:11},()=>"<td>&nbsp;</td>").join("")}</tr>`).join("");
   return `<section class="page-heading no-print"><div><h2>Appendix 70 — PPE Ledger Card</h2><p>Ledger Card for every accepted semi-expendable and capital-outlay unit.</p></div><button class="primary-button" data-print>Print PPE ledger card</button></section>
@@ -1290,6 +1345,7 @@ function bindEnhanced(){
   });
   document.querySelectorAll("[data-edit-property]").forEach(b=>b.onclick=()=>openPropertyForm(+b.dataset.editProperty));
   document.querySelectorAll("[data-generate-property-qr]").forEach(b=>b.onclick=()=>openPropertyQr(+b.dataset.generatePropertyQr));
+  document.querySelectorAll("[data-repair-property]").forEach(b=>b.onclick=()=>{const entry=propertyUnits[+b.dataset.repairProperty];repairPropertyKey=String(entry.dbId||b.dataset.repairProperty);formTab="Pre/Post Inspection";render("Forms")});
   document.querySelectorAll("[data-view-ics]").forEach(b=>b.onclick=()=>{const entry=propertyUnits[+b.dataset.viewIcs];icsPropertyKey=String(entry.dbId||b.dataset.viewIcs);formTab="Appendix 59 (ICS)";render("Forms")});
   document.querySelectorAll("[data-view-par]").forEach(b=>b.onclick=()=>{const entry=propertyUnits[+b.dataset.viewPar];parPropertyKey=String(entry.dbId||b.dataset.viewPar);formTab="Appendix 71 (PAR)";render("Forms")});
   document.querySelectorAll("[data-transfer-property]").forEach(b=>b.onclick=()=>transferProperty(+b.dataset.transferProperty));
@@ -1383,6 +1439,23 @@ function bindEnhanced(){
   document.querySelector("#ppe-ledger-select")?.addEventListener("change",event=>{ppeLedgerKey=event.target.value;rerenderReportSurface()});
   document.querySelector("#par-property-select")?.addEventListener("change",event=>{parPropertyKey=event.target.value;rerenderReportSurface()});
   document.querySelector("#ics-property-select")?.addEventListener("change",event=>{icsPropertyKey=event.target.value;rerenderReportSurface()});
+  document.querySelector("#repair-property-select")?.addEventListener("change",event=>{repairPropertyKey=event.target.value;rerenderReportSurface()});
+  const activeRepairEntry=acceptedAccountablePropertyUnits().find(entry=>entry.key===repairPropertyKey);
+  if(activeRepairEntry){
+    const repairState=repairInspectionState(activeRepairEntry.unit);
+    document.querySelectorAll("[data-repair-field]").forEach(control=>control.addEventListener("change",event=>{repairState[event.target.dataset.repairField]=event.target.value;rerenderReportSurface()}));
+    document.querySelector("#save-repair-report")?.addEventListener("click",()=>{repairState.status="Pre-Repair";repairState.savedAt=localISODate();activeRepairEntry.unit.status="Under Repair";activeRepairEntry.unit.condition="Repair";showToast("Pre-repair inspection saved. The property is now marked Under Repair.");rerenderReportSurface()});
+    document.querySelector("#complete-repair-report")?.addEventListener("click",()=>{
+      const error=document.querySelector("#repair-report-error");
+      if(!repairState.postFindings||!repairState.postInspectedBy||!repairState.postDate){if(error)error.textContent="Post-repair findings, inspector, and inspection date are required before completion.";return}
+      repairState.status="Completed";repairState.completedAt=localISODate();repairState.id=repairState.id||`repair-${Date.now()}`;
+      const history=Array.isArray(activeRepairEntry.unit.propertyHistory)?activeRepairEntry.unit.propertyHistory:[];
+      const repairRecord={id:repairState.id,type:"Repair",status:"Repair",date:repairState.postDate,reference:repairState.jobOrderNumber?`Job Order No.: ${repairState.jobOrderNumber}`:repairState.invoiceNumber?`Invoice No.: ${repairState.invoiceNumber}`:"Repair",natureRepair:repairState.scope||repairState.postFindings,repairAmount:Number(repairState.payableAmount||repairState.jobOrderAmount||0),receiver:activeRepairEntry.unit.employee||""};
+      const existing=history.findIndex(item=>item.id===repairState.id);if(existing>=0)history[existing]=repairRecord;else history.push(repairRecord);activeRepairEntry.unit.propertyHistory=history;
+      activeRepairEntry.unit.status="Issued";activeRepairEntry.unit.condition="Serviceable";repairState.lastRepairDate=repairState.postDate;repairState.lastRepairNature=repairState.scope||repairState.postFindings;
+      showToast("Repair completed. The property record and ledger history were updated.");rerenderReportSurface();
+    });
+  }
   document.querySelectorAll("[data-ptr-state]").forEach(control=>control.addEventListener("input",event=>{
     const field=event.target.dataset.ptrState;
     ptrState[field]=event.target.value;
