@@ -177,17 +177,18 @@
     }
     applyState(state);
     ensureRenewalTestProperty();
+    ensureRepairTestProperty();
     window.inventoryAccess = { isSuperAdmin: true, canWrite: true, canDelete: true, canUnpost: true, profile: { id: "sinop-superadmin", role: "super_admin", full_name: "Sinop Superadmin" } };
     window.inventoryUserProfiles = [{ id: "sinop-superadmin", email: "superadmin@sinop.local", full_name: "Sinop Superadmin", role: "super_admin", active: true }];
     window.inventoryAuditLogs = [];
     const originalRender = render;
-    render = function renderAndPersist(view) {
+    render = function renderAndPersist(view, options) {
       localStorage.setItem(STATE_KEY, JSON.stringify({ pos, iars, risRecords, propertyUnits, rsmiRecords, masters, risAvailableBatches: window.risAvailableBatches || [], employeeAccounts: window.inventoryEmployeeAccounts || [] }));
-      originalRender(view);
+      originalRender(view, options);
       applyTheme();
     };
     applyTheme();
-    render("Dashboard");
+    render(current || "Dashboard", { replace: true });
   } catch (error) {
     document.querySelector("#main").innerHTML = `<section class="panel"><div class="empty-state"><span>!</span><h3>Workspace could not be initialized</h3><p>${text(error?.message || error)}</p></div></section>`;
   }

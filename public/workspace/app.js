@@ -128,6 +128,10 @@ function ensureRenewalTestProperty(){
   if(propertyUnits.some(unit=>unit.dbId==="test-renewal-property-001"))return;
   propertyUnits.push({dbId:"test-renewal-property-001",isTest:true,classification:"Semi-Expendable",item:"TEST — Renewal Sample Property",description:"TEST unit for the three-year accountability renewal workflow",brand:"TEST BRAND",model:"TEST MODEL",serial:"TEST-SN-001",cost:1,date:"August 31, 2023",isoDate:"2023-08-31",acceptedDate:"2023-08-31",issuedDate:"August 31, 2023",po:"TEST-PO",iar:"TEST-IAR",supplier:"TEST SUPPLIER",uom:"Unit",usefulLife:5,employee:"TEST CURRENT RECEIVER",position:"TEST POSITION",office:"TEST OFFICE",location:"TEST LOCATION",condition:"Serviceable",status:"Issued",fundSource:"Regular Fund 01",uacsCode:"1040503000",number:"2023-05-03-999T",icsNumber:"2023-08-999T",icsYear:2023,icsSequence:999,inventoryNumber:"5030-23-999T",issuedBy:"TEST PROPERTY OFFICER",otherInfo:"TEST DATA — safe to use for renewal demonstration",lastRenewalIsoDate:"2023-08-31",renewalDueIsoDate:"2026-08-31",qrVersion:1,renewalHistory:[]});
 }
+function ensureRepairTestProperty(){
+  if(propertyUnits.some(unit=>unit.dbId==="test-repair-property-001"))return;
+  propertyUnits.push({dbId:"test-repair-property-001",isTest:true,classification:"Semi-Expendable",item:"TEST — Repair History Sample Property",description:"TEST property with one completed repair for validating the next repair cycle",brand:"TEST BRAND",model:"TEST MODEL R-1",serial:"TEST-REPAIR-SN-001",cost:12500,date:"January 15, 2025",isoDate:"2025-01-15",acceptedDate:"2025-01-15",issuedDate:"January 20, 2025",po:"TEST-PO-REPAIR",iar:"TEST-IAR-REPAIR",supplier:"TEST SUPPLIER",uom:"Unit",usefulLife:5,employee:"TEST REPAIR RECEIVER",position:"TEST POSITION",office:"TEST OFFICE",location:"TEST LOCATION",condition:"Serviceable",status:"Issued",fundSource:"Regular Fund 01",uacsCode:"1040503000",number:"2025-05-03-998T",icsNumber:"2025-01-998T",icsYear:2025,icsSequence:998,inventoryNumber:"5030-25-998T",issuedBy:"TEST PROPERTY OFFICER",otherInfo:"TEST DATA — first repair is already completed",qrVersion:1,renewalHistory:[],propertyHistory:[{id:"test-repair-history-001",type:"Repair",status:"Repair",date:"2026-07-15",reference:"Job Order No.: TEST-JO-0001",natureRepair:"TEST — Replaced worn power component and completed preventive maintenance",repairAmount:1850,receiver:"TEST REPAIR RECEIVER"}]});
+}
 function renewalAlertMarkup(){
   const due=renewalDueProperties();
   if(!due.length)return "";
@@ -203,10 +207,42 @@ function formsView(){
 
 const views={"Dashboard":dashboard,"Purchase Orders":purchaseOrders,"Inspection & Acceptance":iarView,"Requisition & Issue Slips":enhancedRIS,"Property Records":propertyRecordsView,"Inventory Sticker":inventoryStickerView,"Admin Options":enhancedAdmin,"Forms":formsView,"Reports":enhancedReports,"RSMI Generation":rsmiGenerationView};
 let current="Dashboard";
-function render(view){
- current=view; document.querySelector("#page-title").textContent=view; document.querySelector("#main").innerHTML=views[view]();
- document.querySelectorAll(".sidebar nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
+let browserHistoryReady=false;
+function browserRoute(view=current){
+  const route={view};
+  if(view==="Forms")route.form=formTab;
+  if(view==="Reports")route.report=reportTab;
+  if(view==="Admin Options")route.admin=adminTab;
+  if(view==="Property Records"&&propertyRecordsMode)route.property=propertyRecordsMode;
+  return route;
+}
+function browserRouteKey(route){return JSON.stringify(route||{})}
+function browserRouteUrl(route){const params=new URLSearchParams();params.set("view",route.view);if(route.form)params.set("form",route.form);if(route.report)params.set("report",route.report);if(route.admin)params.set("admin",route.admin);if(route.property)params.set("property",route.property);return `#${params.toString()}`}
+function routeFromBrowser(){
+  const params=new URLSearchParams(location.hash.replace(/^#/,""));
+  const hashRoute={view:params.get("view"),form:params.get("form"),report:params.get("report"),admin:params.get("admin"),property:params.get("property")};
+  const route=hashRoute.view?hashRoute:history.state?.sinopRoute;
+  return route?.view&&views[route.view]?route:null;
+}
+function applyBrowserRoute(route){
+  if(!route)return;
+  if(formOptions.includes(route.form))formTab=route.form;
+  if(physicalReportOptions.includes(route.report))reportTab=route.report;
+  if(route.admin)adminTab=route.admin;
+  propertyRecordsMode=["Semi-Expendable","Capital Outlay"].includes(route.property)?route.property:"";
+}
+function syncBrowserHistory(view,{replace=false}={}){
+  const route=browserRoute(view);
+  if(browserRouteKey(history.state?.sinopRoute)===browserRouteKey(route))return;
+  const method=replace||!history.state?.sinopRoute?"replaceState":"pushState";
+  history[method]({...(history.state||{}),sinopRoute:route},"",browserRouteUrl(route));
+}
+function render(view,options={}){
+ if(!browserHistoryReady){const initialRoute=routeFromBrowser();if(initialRoute){applyBrowserRoute(initialRoute);view=initialRoute.view}browserHistoryReady=true;options={...options,replace:true}}
+ current=views[view]?view:"Dashboard"; document.querySelector("#page-title").textContent=current; document.querySelector("#main").innerHTML=views[current]();
+ document.querySelectorAll(".sidebar nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===current));
  document.querySelector("#sidebar").classList.remove("open"); prepareDatePickers(document.querySelector("#main")); bindEnhanced();
+ if(!options.fromHistory)syncBrowserHistory(current,options);
 }
 function bind(){
  document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>render(b.dataset.go));
@@ -1914,6 +1950,12 @@ document.addEventListener("keydown",event=>{
   const input=event.target.closest?.('input[type="date"]');
   if(!input||input.disabled||input.readOnly||!input.showPicker)return;
   if(event.key==="ArrowDown"&&event.altKey){event.preventDefault();try{input.showPicker()}catch{}}
+});
+window.addEventListener("popstate",event=>{
+  const route=event.state?.sinopRoute||routeFromBrowser();
+  if(!route||!views[route.view])return;
+  applyBrowserRoute(route);
+  render(route.view,{fromHistory:true});
 });
 prepareDatePickers(document);
 render("Dashboard");

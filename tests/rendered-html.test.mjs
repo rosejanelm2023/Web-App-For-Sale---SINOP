@@ -84,6 +84,12 @@ test("packages the complete DMW-parity workspace and verified transfer data", as
   assert.match(engine, /readonly aria-readonly="true"/);
   assert.match(engine, /field==="jobOrderAmount"/);
   assert.match(engine, /repairInspectionHistory/);
+  assert.match(engine, /window\.addEventListener\("popstate"/);
+  assert.match(engine, /history\[method\]/);
+  assert.match(engine, /TEST — Repair History Sample Property/);
+  assert.match(engine, /2026-07-15/);
+  assert.match(engine, /TEST — Replaced worn power component and completed preventive maintenance/);
+  assert.match(hydration, /ensureRepairTestProperty/);
   assert.match(engine, /complete-repair-report/);
   assert.match(engine, /propertyHistory/);
   assert.match(html, /qrcode\.min\.js/);
